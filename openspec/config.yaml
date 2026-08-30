@@ -1,0 +1,56 @@
+schema: spec-driven
+
+context: |
+  Project: tinity — engineering agentic system for AI harness infrastructure.
+  State: Vite + React 19 + Vitest under landing/.
+  Brand: Geist Sans/Mono, 4px grid, dark-first, accent #1fdb12 (see landing/DESIGN.md).
+  Persistence: hybrid (openspec/ + Engram project tinity).
+  Artifact language: English. Review budget: 400 authored lines.
+  `size:exception` accepted this session for a running landing app.
+
+strict_tdd: true
+
+testing:
+  strict_tdd: true
+  runner: vitest
+  layers:
+    unit: true
+    integration: false
+    e2e: false
+  coverage: false
+  quality:
+    linter: false
+    type_checker: true
+    formatter: false
+  test_command: "pnpm --dir landing test"
+  coverage_command: ""
+  note: >
+    Strict TDD is active. Unit tests cover the experience machine, tiles, and
+    delays without WebGL.
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+    - Keep first-slice scope inside landing/ unless the change explicitly expands the product
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Treat landing/DESIGN.md as the brand-token source of truth
+    - Document architecture decisions with rationale
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks completable in one session
+    - Forecast 400-line review-budget risk before apply
+  apply:
+    guidelines:
+      - Do not invent a second brand accent or a test runner that is not Vitest
+      - Follow existing files when they exist; do not scaffold a stack the change did not request
+    tdd: true
+    test_command: "pnpm --dir landing test"
+  verify:
+    test_command: "pnpm --dir landing test"
+    build_command: "pnpm --dir landing build"
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas

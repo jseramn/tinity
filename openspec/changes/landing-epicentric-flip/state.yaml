@@ -1,0 +1,19 @@
+change: landing-epicentric-flip
+phase: verify
+artifact_store: hybrid
+execution_mode: auto
+delivery_strategy: ask-on-risk
+review_budget_lines: 400
+verdict: pass_with_warnings
+artifacts:
+  explore: true
+  proposal: true
+  specs: true
+  design: true
+  tasks: true
+  apply: true
+  verify: true
+tasks_progress:
+  completed: [1.1, 1.2, 2.1, 2.2, 2.3, 3.1, 3.2, 3.3, 4.1, 4.2]
+  pending: []
+last_updated: 2026-08-30T04:25:00Z
