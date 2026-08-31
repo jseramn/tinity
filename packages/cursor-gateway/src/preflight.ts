@@ -22,6 +22,7 @@ export type PreflightOk = {
   workspace: string;
   model: string;
   jobTimeoutMs?: number;
+  fast?: boolean;
 };
 
 export type PreflightErr = {
@@ -62,14 +63,18 @@ export function inspectHealth(body: HealthBody, expectedWorkspace: string): Pref
   if (expected.length === 0 || workspace !== expected) {
     return { ok: false, reason: "workspace-mismatch" };
   }
+  const ok: PreflightOk = { ok: true, workspace, model };
   if (body.jobTimeoutMs !== undefined) {
     const ms = body.jobTimeoutMs;
     if (typeof ms !== "number" || !Number.isFinite(ms) || ms <= 0) {
       return { ok: false, reason: "health-stale" };
     }
-    return { ok: true, workspace, model, jobTimeoutMs: ms };
+    ok.jobTimeoutMs = ms;
   }
-  return { ok: true, workspace, model };
+  if (body.fast !== undefined) {
+    ok.fast = body.fast as boolean;
+  }
+  return ok;
 }
 
 export function inspectModelsList(

@@ -188,6 +188,43 @@ describe("inspectHealth", () => {
     ).toEqual({ ok: false, reason: "health-stale" });
   });
 
+  it("forwards fast when present and omits it when live-old", () => {
+    expect(
+      inspectHealth(
+        {
+          ok: true,
+          busy: false,
+          workspace: "/home/jseramn/tinity",
+          model: "grok-4.6[effort=high,fast=false]",
+          jobTimeoutMs: 600000,
+          fast: false,
+        },
+        "/home/jseramn/tinity",
+      ),
+    ).toEqual({
+      ok: true,
+      workspace: "/home/jseramn/tinity",
+      model: "grok-4.6[effort=high,fast=false]",
+      jobTimeoutMs: 600000,
+      fast: false,
+    });
+    expect(
+      inspectHealth(
+        {
+          ok: true,
+          busy: false,
+          workspace: "/home/jseramn/tinity",
+          model: "grok-4.6[effort=high,fast=false]",
+        },
+        "/home/jseramn/tinity",
+      ),
+    ).toEqual({
+      ok: true,
+      workspace: "/home/jseramn/tinity",
+      model: "grok-4.6[effort=high,fast=false]",
+    });
+  });
+
   it("treats explicit fast true as Fast and invalid fast as stale", () => {
     expect(
       inspectHealth(
@@ -204,6 +241,7 @@ describe("inspectHealth", () => {
       ok: true,
       workspace: "/home/jseramn/tinity",
       model: "grok-4.6[effort=high,fast=false]",
+      fast: false,
     });
     expect(
       inspectHealth(
@@ -284,6 +322,7 @@ describe("preflightWrap", () => {
       workspace: "/tmp/ws-preflight",
       model: "grok-4.6[effort=high,fast=false]",
       jobTimeoutMs: 600000,
+      fast: false,
     });
     expect(capture).toEqual([]);
   });
