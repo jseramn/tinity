@@ -34,7 +34,7 @@ Do not use AI_GATEWAY_API_KEY here. The wrap strips it from the child env.
 cursor-agent -p --output-format stream-json --trust --workspace PATH
 --model grok-4.6[effort=high,fast=false] PROMPT
 
-No --force. Prompt is the last argv token. One job at a time. Busy POST returns 409 Conflict.
+No --force. Prompt is the last argv token. One job at a time. Busy POST returns 409 Conflict with Retry-After: 1.
 
 ## Endpoints
 
@@ -44,14 +44,14 @@ No --force. Prompt is the last argv token. One job at a time. Busy POST returns 
 
 Request model is ignored. Spawn always uses wrap config (high, never Fast).
 Harnesses MUST preflight GET /health then GET /v1/models before POST (inspectHealth / inspectModelsList / preflightWrap, or package script preflight): require workspace+model with explicit fast=false, refuse busy, stale health, models 404, workspace mismatch, or Fast. HTTP timeout 2000ms. Ok forwards jobTimeoutMs and fast when present. Do not send Casos work to a wrap bound to another tree.
-Missing or empty messages: 400. Concurrent job: 409. Prompt over 100000 chars: 413, no spawn. Hung child past CURSOR_AGENT_TIMEOUT_MS: 504, mutex released.
+Missing or empty messages: 400. Concurrent job: 409 plus Retry-After: 1 and error.retry_after. Prompt over 100000 chars: 413, no spawn. Hung child past CURSOR_AGENT_TIMEOUT_MS: 504, mutex released.
 
 ## Invariants tests lock
 
 - Host is always 127.0.0.1
 - Default model grok-4.6[effort=high,fast=false]; fast=true is coerced off; omitted fast=false is appended
 - Child env drops AI_GATEWAY_API_KEY
-- One job; 409 while busy
+- One job; 409 while busy includes Retry-After: 1 and error.retry_after
 - Prompt over 100000 chars: 413, no spawn
 - Health includes workspace, model, jobTimeoutMs, and fast; model never Fast; fast is false
 - GET /v1/models lists wrap model; never Fast; no spawn

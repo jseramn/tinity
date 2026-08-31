@@ -201,6 +201,8 @@ describe("sse and mutex", () => {
       messages: [{ role: "user", content: "Nope" }],
     });
     expect(second.status).toBe(409);
+    expect(second.headers["retry-after"]).toBe("1");
+    expect(JSON.parse(second.text).error.retry_after).toBe(1);
     expect(capture).toHaveLength(1);
     expect(capture[0]?.args.join(" ")).not.toMatch(/fast\s*=\s*true/);
     expect(capture[0]?.args).toContain("grok-4.6[effort=high,fast=false]");

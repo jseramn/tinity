@@ -26,11 +26,19 @@ type ChatBody = {
   model?: string;
 };
 
-function json(res: ServerResponse, status: number, body: unknown): void {
+export const BUSY_RETRY_AFTER_SEC = 1;
+
+function json(
+  res: ServerResponse,
+  status: number,
+  body: unknown,
+  extraHeaders?: Record<string, string>,
+): void {
   const payload = JSON.stringify(body);
   res.writeHead(status, {
     "Content-Type": "application/json; charset=utf-8",
     "Content-Length": Buffer.byteLength(payload),
+    ...extraHeaders,
   });
   res.end(payload);
 }
@@ -207,9 +215,19 @@ async function handleChat(
   }
 
   if (!mutex.tryAcquire()) {
-    json(res, 409, {
-      error: { message: "Another agent job is already running", type: "conflict", code: "busy" },
-    });
+    json(
+      res,
+      409,
+      {
+        error: {
+          message: "Another agent job is already running",
+          type: "conflict",
+          code: "busy",
+          retry_after: BUSY_RETRY_AFTER_SEC,
+        },
+      },
+      { "Retry-After": String(BUSY_RETRY_AFTER_SEC) },
+    );
     return;
   }
 

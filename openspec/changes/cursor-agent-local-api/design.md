@@ -14,14 +14,14 @@ TypeScript + Vitest matching landing. Listen on 127.0.0.1:4390. One in-process m
 | Agent | Wrap CLI / reimplement HTTP client | Reimplement fights Cursor login | **Spawn CLI** |
 | Model | CLI default low / wrap high | Fast is forbidden | **grok-4.6[effort=high,fast=false]** |
 | Bind | 127.0.0.1 / 0.0.0.0 | Public bind races other local APIs | **127.0.0.1:4390** |
-| Concurrency | Mutex / queue / parallel | CLI + Grok load | **Mutex, 409 if busy** |
+| Concurrency | Mutex / queue / parallel | CLI + Grok load | **Mutex, 409 if busy (Retry-After: 1)** |
 | Auth | Cursor login / CURSOR_API_KEY / AI Gateway | Gateway keys MUST NOT leak in | **Login + optional CURSOR_API_KEY** |
 | Stream | stream-json / text / json | Need SSE mapping | **stream-json** |
 | Tests | Live CLI / mock spawn | Live costs and load | **mock spawn** |
 
 ## Data Flow
 
-POST /v1/chat/completions parses messages, assembles prompt, try-acquires mutex (else 409), spawns cursor-agent, maps NDJSON. stream=true yields SSE; stream=false collects JSON. Mutex is released on end or error. Child past CURSOR_AGENT_TIMEOUT_MS (default 600000) is SIGTERM; non-stream clients get 504 and the mutex is released.
+POST /v1/chat/completions parses messages, assembles prompt, try-acquires mutex (else 409 with Retry-After: 1 and error.retry_after), spawns cursor-agent, maps NDJSON. stream=true yields SSE; stream=false collects JSON. Mutex is released on end or error. Child past CURSOR_AGENT_TIMEOUT_MS (default 600000) is SIGTERM; non-stream clients get 504 and the mutex is released. Harnesses that see 409 should GET /health and retry after 1s, not wait the full job timeout.
 
 ## File Changes
 
