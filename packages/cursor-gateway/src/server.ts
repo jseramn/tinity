@@ -18,6 +18,7 @@ export type GatewayDeps = {
   config: GatewayConfig;
   mutex?: JobMutex;
   spawn?: SpawnImpl;
+  now?: () => Date;
 };
 
 type ChatBody = {
@@ -116,9 +117,10 @@ export function createGatewayServer(deps: GatewayDeps): http.Server {
   const mutex = deps.mutex ?? new JobMutex();
   const { config } = deps;
   if (deps.spawn) setSpawnImpl(deps.spawn);
+  const startedAt = (deps.now ?? (() => new Date()))().toISOString();
 
   return http.createServer((req, res) => {
-    void handleRequest(req, res, config, mutex);
+    void handleRequest(req, res, config, mutex, startedAt);
   });
 }
 
@@ -141,6 +143,7 @@ async function handleRequest(
   res: ServerResponse,
   config: GatewayConfig,
   mutex: JobMutex,
+  startedAt: string,
 ): Promise<void> {
   const url = req.url ?? "/";
   const path = url.split("?")[0];
@@ -154,6 +157,7 @@ async function handleRequest(
       model: config.model,
       jobTimeoutMs: config.jobTimeoutMs,
       fast: isFastModel(config.model),
+      startedAt,
     });
     return;
   }

@@ -49,6 +49,8 @@ function call(
   });
 }
 
+const FROZEN_START = "2026-08-31T17:40:00.000Z";
+
 async function startGateway(spawn = mockSpawn([], () => createFakeChild({ lines: assistantLines }))) {
   const capture: FakeSpawnCapture[] = [];
   const wrapped = mockSpawn(capture, () => {
@@ -57,7 +59,12 @@ async function startGateway(spawn = mockSpawn([], () => createFakeChild({ lines:
   });
   const mutex = new JobMutex();
   const config = loadConfig({ CURSOR_GATEWAY_PORT: "0" }, "/home/jseramn/tinity");
-  const server = createGatewayServer({ config, mutex, spawn: wrapped });
+  const server = createGatewayServer({
+    config,
+    mutex,
+    spawn: wrapped,
+    now: () => new Date(FROZEN_START),
+  });
   await listenLocal(server, { host: config.host, port: 0 });
   const addr = server.address();
   if (!addr || typeof addr === "string") throw new Error("no address");
@@ -94,6 +101,7 @@ describe("cursor-gateway http", () => {
       model: string;
       jobTimeoutMs: number;
       fast: boolean;
+      startedAt: string;
     };
     expect(body.ok).toBe(true);
     expect(body.version).toMatch(/^\d+\.\d+\.\d+/);
@@ -103,6 +111,9 @@ describe("cursor-gateway http", () => {
     expect(body.model).not.toMatch(/fast\s*=\s*true/i);
     expect(body.jobTimeoutMs).toBe(600000);
     expect(body.fast).toBe(false);
+    expect(body.startedAt).toBe(FROZEN_START);
+    const again = await call(g.port, "GET", "/health");
+    expect(JSON.parse(again.text).startedAt).toBe(body.startedAt);
   });
 
   it("lists wrap model on GET /v1/models without spawning", async () => {

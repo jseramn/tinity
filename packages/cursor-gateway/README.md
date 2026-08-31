@@ -38,7 +38,7 @@ No --force. Prompt is the last argv token. One job at a time. Busy POST returns 
 
 ## Endpoints
 
-- GET /health -> {ok, version, busy, workspace, model, jobTimeoutMs, fast}
+- GET /health -> {ok, version, busy, workspace, model, jobTimeoutMs, fast, startedAt}
 - GET /v1/models -> OpenAI list of wrap model (never Fast), no spawn
 - POST /v1/chat/completions (messages[], stream)
 
@@ -53,7 +53,7 @@ Missing or empty messages: 400. Concurrent job: 409 plus Retry-After: 1 and erro
 - Child env drops AI_GATEWAY_API_KEY
 - One job; 409 while busy includes Retry-After: 1 and error.retry_after
 - Prompt over 100000 chars: 413, no spawn
-- Health includes workspace, model, jobTimeoutMs, and fast; model never Fast; fast is false
+- Health includes workspace, model, jobTimeoutMs, fast, and startedAt; model never Fast; fast is false; startedAt is stable for the process
 - GET /v1/models lists wrap model; never Fast; no spawn
 - preflight refuses stale health, models 404, busy, workspace mismatch, Fast, model without fast=false, health.fast true, or invalid jobTimeoutMs; missing jobTimeoutMs or fast is live-old ok; when present, jobTimeoutMs and fast are forwarded on ok
 - Hung child past job timeout: 504, mutex released
