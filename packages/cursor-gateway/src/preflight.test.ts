@@ -155,6 +155,38 @@ describe("inspectHealth", () => {
       ),
     ).toEqual({ ok: false, reason: "fast-model" });
   });
+
+  it("forwards positive jobTimeoutMs and rejects invalid", () => {
+    expect(
+      inspectHealth(
+        {
+          ok: true,
+          busy: false,
+          workspace: "/home/jseramn/tinity",
+          model: "grok-4.6[effort=high,fast=false]",
+          jobTimeoutMs: 600000,
+        },
+        "/home/jseramn/tinity",
+      ),
+    ).toEqual({
+      ok: true,
+      workspace: "/home/jseramn/tinity",
+      model: "grok-4.6[effort=high,fast=false]",
+      jobTimeoutMs: 600000,
+    });
+    expect(
+      inspectHealth(
+        {
+          ok: true,
+          busy: false,
+          workspace: "/home/jseramn/tinity",
+          model: "grok-4.6[effort=high,fast=false]",
+          jobTimeoutMs: 0,
+        },
+        "/home/jseramn/tinity",
+      ),
+    ).toEqual({ ok: false, reason: "health-stale" });
+  });
 });
 
 describe("inspectModelsList", () => {
@@ -208,6 +240,7 @@ describe("preflightWrap", () => {
       ok: true,
       workspace: "/tmp/ws-preflight",
       model: "grok-4.6[effort=high,fast=false]",
+      jobTimeoutMs: 600000,
     });
     expect(capture).toEqual([]);
   });

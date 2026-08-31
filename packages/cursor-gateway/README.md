@@ -53,7 +53,7 @@ Missing or empty messages: 400. Concurrent job: 409. Prompt over 100000 chars: 4
 - Prompt over 100000 chars: 413, no spawn
 - Health includes workspace, model, and jobTimeoutMs; model never Fast
 - GET /v1/models lists wrap model; never Fast; no spawn
-- preflight refuses stale health, models 404, busy, workspace mismatch, Fast, or model without fast=false
+- preflight refuses stale health, models 404, busy, workspace mismatch, Fast, model without fast=false, or invalid jobTimeoutMs; missing jobTimeoutMs is live-old ok
 - Hung child past job timeout: 504, mutex released
 
 ## Known limits
@@ -62,6 +62,6 @@ Missing or empty messages: 400. Concurrent job: 409. Prompt over 100000 chars: 4
 - Prompt is last argv; wrap rejects over 100000 chars with 413 before spawn
 - streamChild still emits thinking-like assistant deltas as SSE
 - Not a Vercel Function
-- Default job timeout 600000ms (CURSOR_AGENT_TIMEOUT_MS); live wrap is not recycled in this slice
+- Default job timeout 600000ms (CURSOR_AGENT_TIMEOUT_MS); GET /health exposes jobTimeoutMs
 
 Commands: package scripts test and start from packages/cursor-gateway.

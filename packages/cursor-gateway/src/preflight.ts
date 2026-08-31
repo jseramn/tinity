@@ -8,6 +8,7 @@ export type HealthBody = {
   busy?: unknown;
   workspace?: unknown;
   model?: unknown;
+  jobTimeoutMs?: unknown;
 };
 
 export type ModelsBody = {
@@ -19,6 +20,7 @@ export type PreflightOk = {
   ok: true;
   workspace: string;
   model: string;
+  jobTimeoutMs?: number;
 };
 
 export type PreflightErr = {
@@ -54,6 +56,13 @@ export function inspectHealth(body: HealthBody, expectedWorkspace: string): Pref
   const expected = normalizeWorkspace(expectedWorkspace);
   if (expected.length === 0 || workspace !== expected) {
     return { ok: false, reason: "workspace-mismatch" };
+  }
+  if (body.jobTimeoutMs !== undefined) {
+    const ms = body.jobTimeoutMs;
+    if (typeof ms !== "number" || !Number.isFinite(ms) || ms <= 0) {
+      return { ok: false, reason: "health-stale" };
+    }
+    return { ok: true, workspace, model, jobTimeoutMs: ms };
   }
   return { ok: true, workspace, model };
 }
