@@ -8,10 +8,10 @@ Bind: 127.0.0.1:4390 (3000 Hermes WhatsApp, 18789 OpenClaw, 7437 Engram).
 
 ## Run
 
-Use package scripts test, start, and dev.
+From repo root. Package node_modules is already present; do not install.
 
-Package scripts: test, start, dev. See package.json.
-    pnpm --dir packages/cursor-gateway start
+Use package scripts test and start. See package.json.
+
 Tests mock spawn and must not fire a live Grok job.
 
 ## Env
@@ -24,15 +24,35 @@ Tests mock spawn and must not fire a live Grok job.
 ## Auth
 
 cursor-agent status (Cursor login). Optional CURSOR_API_KEY is inherited.
-Do not use AI_GATEWAY_API_KEY here.
+Do not use AI_GATEWAY_API_KEY here. The wrap strips it from the child env.
 
 ## Spawn argv
 
 cursor-agent -p --output-format stream-json --trust --workspace PATH
 --model grok-4.6[effort=high,fast=false] PROMPT
-One job at a time. Busy POST returns 409 Conflict.
+
+No --force. Prompt is the last argv token. One job at a time. Busy POST returns 409 Conflict.
 
 ## Endpoints
 
 - GET /health -> {ok, version, busy}
 - POST /v1/chat/completions (messages[], stream)
+
+Request model is ignored. Spawn always uses wrap config (high, never Fast).
+Missing or empty messages: 400. Concurrent job: 409.
+
+## Invariants tests lock
+
+- Host is always 127.0.0.1
+- Default model grok-4.6[effort=high,fast=false]; fast=true is coerced off
+- Child env drops AI_GATEWAY_API_KEY
+- One job; 409 while busy
+
+## Known limits
+
+- Spawn has no --force
+- Prompt is last argv (length limits)
+- streamChild still emits thinking-like assistant deltas as SSE
+- Not a Vercel Function
+
+Commands: package scripts test and start from packages/cursor-gateway.

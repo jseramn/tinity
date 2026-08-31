@@ -31,4 +31,19 @@ describe("assemblePrompt", () => {
       ]),
     ).toBe("Hi there");
   });
+
+  it("joins multiple system messages", () => {
+    expect(
+      assemblePrompt([
+        { role: "system", content: "A" },
+        { role: "system", content: "B" },
+        { role: "user", content: "Hi" },
+      ]),
+    ).toBe("System:\nA\n\nB\n\nUser:\nHi");
+  });
+
+  it("returns empty when there is no user text", () => {
+    expect(assemblePrompt([])).toBe("");
+    expect(assemblePrompt([{ role: "assistant", content: "x" }])).toBe("");
+  });
 });

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mapStreamJsonEvent } from "./stream-map";
+import { mapStreamJsonEvent, parseNdjsonLine } from "./stream-map";
 
 describe("mapStreamJsonEvent", () => {
   it("maps assistant text and does not duplicate result", () => {
@@ -38,5 +38,29 @@ describe("mapStreamJsonEvent", () => {
     expect(mapStreamJsonEvent({ type: "system" }).kind).toBe("ignore");
     expect(mapStreamJsonEvent({ type: "user" }).kind).toBe("ignore");
     expect(mapStreamJsonEvent({ type: "tool_call" }).kind).toBe("ignore");
+  });
+
+  it("maps thinking-like assistant text as a delta (stream still forwards it)", () => {
+    const mapped = mapStreamJsonEvent({
+      type: "assistant",
+      message: { content: [{ type: "text", text: "thinking: scratch work" }] },
+    });
+    expect(mapped).toEqual({ kind: "delta", text: "thinking: scratch work" });
+  });
+
+  it("finishes with empty text when result is not a string", () => {
+    expect(mapStreamJsonEvent({ type: "result", result: { ok: true } })).toEqual({
+      kind: "finish",
+      text: "",
+    });
+  });
+});
+
+describe("parseNdjsonLine", () => {
+  it("parses objects and skips junk", () => {
+    expect(parseNdjsonLine("")).toBeUndefined();
+    expect(parseNdjsonLine("   ")).toBeUndefined();
+    expect(parseNdjsonLine("not-json")).toBeUndefined();
+    expect(parseNdjsonLine('{"type":"assistant"}')).toEqual({ type: "assistant" });
   });
 });

@@ -30,6 +30,8 @@ pnpm --dir landing build
 
 Vite `base` is `/tinity/`. Production asset URLs start with that prefix.
 
+Local wrap (127.0.0.1:4390). Package deps already present; do not install. See packages/cursor-gateway/README.md. Tests mock spawn and must not fire a live Grok job.
+
 ## License
 
 MIT. Copyright 2026 Jose Ramon. See [LICENSE](LICENSE).

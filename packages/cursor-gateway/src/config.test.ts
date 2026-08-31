@@ -40,10 +40,24 @@ describe("loadConfig", () => {
     expect(cfg.model).toContain("fast=false");
     expect(cfg.model).not.toMatch(/fast\s*=\s*true/i);
   });
+
+  it("falls back to 4390 on invalid ports", () => {
+    expect(loadConfig({ CURSOR_GATEWAY_PORT: "nope" }, "/tmp/ws").port).toBe(4390);
+    expect(loadConfig({ CURSOR_GATEWAY_PORT: "0" }, "/tmp/ws").port).toBe(4390);
+    expect(loadConfig({ CURSOR_GATEWAY_PORT: "-3" }, "/tmp/ws").port).toBe(4390);
+  });
 });
 
 describe("resolveModel", () => {
   it("uses the wrap default when unset", () => {
     expect(resolveModel()).toBe("grok-4.6[effort=high,fast=false]");
+    expect(resolveModel("")).toBe("grok-4.6[effort=high,fast=false]");
+    expect(resolveModel("   ")).toBe("grok-4.6[effort=high,fast=false]");
+  });
+
+  it("forces fast=false without rewriting other model fields", () => {
+    const model = resolveModel("grok-4.6[effort=low,fast=true]");
+    expect(model).toBe("grok-4.6[effort=low,fast=false]");
+    expect(resolveModel("grok-4.6[fast = TRUE]")).not.toMatch(/fast\s*=\s*true/i);
   });
 });

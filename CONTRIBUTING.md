@@ -11,9 +11,13 @@ Thanks for wanting to help. This project is early. Read this and the [Code of Co
 
 ## Dev
 
-Landing already has local deps; do not install unless missing.
+Landing and wrap already have local deps; do not install unless missing.
 
-From repo root: tests and dev for landing/, then tests and start for packages/cursor-gateway (localhost port 4390, grok-4.6 high, never Fast). Mocked tests must not fire a live job.
+From repo root: landing test, then packages/cursor-gateway test and start.
+
+Wrap binds 127.0.0.1:4390, grok-4.6 high, never Fast. Mocked tests must not fire a live job.
+
+See packages/cursor-gateway/README.md.
 
 ## PRs
 
@@ -24,4 +28,4 @@ From repo root: tests and dev for landing/, then tests and start for packages/cu
 
 ## Security
 
-Do not file public issues for secrets or exploitable bugs. Use a GitHub issue on [jseramn/tinity](https://github.com/jseramn/tinity/issues) only for non-sensitive reports until SECURITY.md exists.
+Do not file public issues for secrets or exploitable bugs. Use a GitHub issue on the tinity repo only for non-sensitive reports until SECURITY.md exists.
