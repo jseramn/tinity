@@ -49,7 +49,7 @@ Missing or empty messages: 400. Concurrent job: 409. Prompt over 100000 chars: 4
 ## Invariants tests lock
 
 - Host is always 127.0.0.1
-- Default model grok-4.6[effort=high,fast=false]; fast=true is coerced off
+- Default model grok-4.6[effort=high,fast=false]; fast=true is coerced off; omitted fast=false is appended
 - Child env drops AI_GATEWAY_API_KEY
 - One job; 409 while busy
 - Prompt over 100000 chars: 413, no spawn
@@ -61,7 +61,7 @@ Missing or empty messages: 400. Concurrent job: 409. Prompt over 100000 chars: 4
 
 ## Known limits
 
-- Spawn has no --force; spawn also coerces fast=false
+- Spawn has no --force; spawn also coerces fast=false and appends it when omitted
 - Prompt is last argv; wrap rejects over 100000 chars with 413 before spawn
 - streamChild still emits thinking-like assistant deltas as SSE
 - Not a Vercel Function

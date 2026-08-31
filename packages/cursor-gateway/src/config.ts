@@ -17,7 +17,10 @@ export type GatewayConfig = {
 
 export function resolveModel(raw?: string): string {
   const model = (raw && raw.trim()) || DEFAULT_MODEL;
-  return model.replace(/fast\s*=\s*true/gi, "fast=false");
+  const coerced = model.replace(/fast\s*=\s*true/gi, "fast=false");
+  if (/fast\s*=\s*false/i.test(coerced)) return coerced;
+  if (coerced.includes("[")) return coerced.replace(/\]\s*$/, ",fast=false]");
+  return coerced + "[fast=false]";
 }
 
 export function resolveJobTimeoutMs(raw?: string): number {

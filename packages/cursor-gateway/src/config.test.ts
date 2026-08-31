@@ -62,6 +62,12 @@ describe("resolveModel", () => {
     expect(model).toBe("grok-4.6[effort=low,fast=false]");
     expect(resolveModel("grok-4.6[fast = TRUE]")).not.toMatch(/fast\s*=\s*true/i);
   });
+
+  it("appends fast=false when the model omits it", () => {
+    expect(resolveModel("grok-4.6")).toBe("grok-4.6[fast=false]");
+    expect(resolveModel("grok-4.6[effort=high]")).toBe("grok-4.6[effort=high,fast=false]");
+  });
+
 });
 
 describe("resolveJobTimeoutMs", () => {
