@@ -1,0 +1,12 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "outputDirectory": "landing/dist",
+  "rewrites": [
+    { "source": "/tinity", "destination": "/index.html" },
+    { "source": "/tinity/", "destination": "/index.html" },
+    { "source": "/tinity/assets/:path*", "destination": "/assets/:path*" },
+    { "source": "/tinity/:path*", "destination": "/index.html" },
+    { "source": "/", "destination": "/index.html" }
+  ]
+}
