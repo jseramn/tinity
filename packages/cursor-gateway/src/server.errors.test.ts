@@ -123,3 +123,47 @@ describe("cursor-gateway errors", () => {
     expect(g.capture).toHaveLength(0);
   });
 });
+
+describe("cursor-gateway job timeout", () => {
+  it("returns 504, kills the child, and releases the mutex", async () => {
+    const capture: FakeSpawnCapture[] = [];
+    const fake = createFakeChild({ lines: assistantLines, hold: true });
+    let n = 0;
+    const spawn = mockSpawn(capture, () => {
+      n += 1;
+      if (n === 1) return fake;
+      return createFakeChild({ lines: assistantLines });
+    });
+    const mutex = new JobMutex();
+    const config = loadConfig(
+      { CURSOR_GATEWAY_PORT: "0", CURSOR_AGENT_TIMEOUT_MS: "80" },
+      "/tmp/ws",
+    );
+    expect(config.jobTimeoutMs).toBe(80);
+    const server = createGatewayServer({ config, mutex, spawn });
+    await listenLocal(server, { host: "127.0.0.1", port: 0 });
+    servers.push(server);
+    const addr = server.address();
+    if (!addr || typeof addr === "string") throw new Error("no address");
+    const port = addr.port;
+
+    const res = await call(port, "POST", "/v1/chat/completions", {
+      messages: [{ role: "user", content: "Hello" }],
+    });
+    expect(res.status).toBe(504);
+    const body = JSON.parse(res.text) as { error: { code?: string; message: string } };
+    expect(body.error.code).toBe("timeout");
+    expect(body.error.message).toBe("job timeout");
+    expect(mutex.busy).toBe(false);
+    expect(fake.child.killed).toBe(true);
+    expect(capture).toHaveLength(1);
+
+    const follow = await call(port, "POST", "/v1/chat/completions", {
+      messages: [{ role: "user", content: "Again" }],
+    });
+    expect(follow.status).toBe(200);
+    expect(capture).toHaveLength(2);
+    expect(JSON.parse(follow.text).choices[0].message.content).toBe("Hi");
+  });
+});
+

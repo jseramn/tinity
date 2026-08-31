@@ -236,15 +236,25 @@ async function handleChat(
   };
   req.on("close", onAbort);
 
+  const work = stream
+    ? streamChild(child, res, { id, created, model })
+    : collectChild(child).then((text) => {
+        json(res, 200, completionObject({ id, created, model, text }));
+      });
+
   try {
-    if (stream) {
-      await streamChild(child, res, { id, created, model });
-    } else {
-      const text = await collectChild(child);
-      json(res, 200, completionObject({ id, created, model, text }));
-    }
+    await withJobTimeout(child, config.jobTimeoutMs, work);
   } catch (err) {
-    if (!res.headersSent) {
+    if (isJobTimeout(err)) {
+      await work.catch(() => undefined);
+      if (!res.headersSent) {
+        json(res, 504, {
+          error: { message: "job timeout", type: "server_error", code: "timeout" },
+        });
+      } else {
+        res.end();
+      }
+    } else if (!res.headersSent) {
       json(res, 502, {
         error: {
           message: err instanceof Error ? err.message : "agent failed",
@@ -258,4 +268,25 @@ async function handleChat(
     req.off("close", onAbort);
     mutex.release();
   }
+}
+
+const JOB_TIMEOUT = "JOB_TIMEOUT";
+
+function isJobTimeout(err: unknown): boolean {
+  return err instanceof Error && (err as Error & { code?: string }).code === JOB_TIMEOUT;
+}
+
+function withJobTimeout<T>(child: ChildProcess, ms: number, work: Promise<T>): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      if (!child.killed) child.kill("SIGTERM");
+      const err = new Error("job timeout") as Error & { code: string };
+      err.code = JOB_TIMEOUT;
+      reject(err);
+    }, ms);
+  });
+  return Promise.race([work, timeout]).finally(() => {
+    if (timer) clearTimeout(timer);
+  });
 }

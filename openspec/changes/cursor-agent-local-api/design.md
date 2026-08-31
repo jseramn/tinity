@@ -21,7 +21,7 @@ TypeScript + Vitest matching landing. Listen on 127.0.0.1:4390. One in-process m
 
 ## Data Flow
 
-POST /v1/chat/completions parses messages, assembles prompt, try-acquires mutex (else 409), spawns cursor-agent, maps NDJSON. stream=true yields SSE; stream=false collects JSON. Mutex is released on end or error.
+POST /v1/chat/completions parses messages, assembles prompt, try-acquires mutex (else 409), spawns cursor-agent, maps NDJSON. stream=true yields SSE; stream=false collects JSON. Mutex is released on end or error. Child past CURSOR_AGENT_TIMEOUT_MS (default 600000) is SIGTERM; non-stream clients get 504 and the mutex is released.
 
 ## File Changes
 

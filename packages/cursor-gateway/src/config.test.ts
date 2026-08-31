@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   DEFAULT_HOST,
+  DEFAULT_JOB_TIMEOUT_MS,
   DEFAULT_MODEL,
   DEFAULT_PORT,
   loadConfig,
+  resolveJobTimeoutMs,
   resolveModel,
 } from "./config";
 
@@ -61,3 +63,21 @@ describe("resolveModel", () => {
     expect(resolveModel("grok-4.6[fast = TRUE]")).not.toMatch(/fast\s*=\s*true/i);
   });
 });
+
+describe("resolveJobTimeoutMs", () => {
+  it("defaults to ten minutes", () => {
+    expect(DEFAULT_JOB_TIMEOUT_MS).toBe(600_000);
+    expect(resolveJobTimeoutMs()).toBe(600_000);
+    expect(resolveJobTimeoutMs("")).toBe(600_000);
+    expect(loadConfig({}, "/tmp/ws").jobTimeoutMs).toBe(600_000);
+  });
+
+  it("reads CURSOR_AGENT_TIMEOUT_MS and falls back on invalid", () => {
+    expect(resolveJobTimeoutMs("80")).toBe(80);
+    expect(loadConfig({ CURSOR_AGENT_TIMEOUT_MS: "80" }, "/tmp/ws").jobTimeoutMs).toBe(80);
+    expect(resolveJobTimeoutMs("nope")).toBe(600_000);
+    expect(resolveJobTimeoutMs("0")).toBe(600_000);
+    expect(resolveJobTimeoutMs("-3")).toBe(600_000);
+  });
+});
+

@@ -20,6 +20,7 @@ Tests mock spawn and must not fire a live Grok job.
 - CURSOR_AGENT_BIN: cursor-agent
 - CURSOR_AGENT_MODEL: grok-4.6[effort=high,fast=false] (never Fast)
 - CURSOR_AGENT_WORKSPACE: process cwd
+- CURSOR_AGENT_TIMEOUT_MS: 600000. Hung child is SIGTERM, 504, mutex released.
 
 ## Auth
 
@@ -41,7 +42,7 @@ No --force. Prompt is the last argv token. One job at a time. Busy POST returns 
 
 Request model is ignored. Spawn always uses wrap config (high, never Fast).
 Harnesses MUST preflight GET /health then GET /v1/models before POST (inspectHealth / inspectModelsList / preflightWrap): require workspace+model with explicit fast=false, refuse busy, stale health, models 404, workspace mismatch, or Fast. HTTP timeout 2000ms. Do not send Casos work to a wrap bound to another tree.
-Missing or empty messages: 400. Concurrent job: 409. Prompt over 100000 chars: 413, no spawn.
+Missing or empty messages: 400. Concurrent job: 409. Prompt over 100000 chars: 413, no spawn. Hung child past CURSOR_AGENT_TIMEOUT_MS: 504, mutex released.
 
 ## Invariants tests lock
 
@@ -53,6 +54,7 @@ Missing or empty messages: 400. Concurrent job: 409. Prompt over 100000 chars: 4
 - Health includes workspace and model; model never Fast
 - GET /v1/models lists wrap model; never Fast; no spawn
 - preflight refuses stale health, models 404, busy, workspace mismatch, Fast, or model without fast=false
+- Hung child past job timeout: 504, mutex released
 
 ## Known limits
 
@@ -60,5 +62,6 @@ Missing or empty messages: 400. Concurrent job: 409. Prompt over 100000 chars: 4
 - Prompt is last argv; wrap rejects over 100000 chars with 413 before spawn
 - streamChild still emits thinking-like assistant deltas as SSE
 - Not a Vercel Function
+- Default job timeout 600000ms (CURSOR_AGENT_TIMEOUT_MS); live wrap is not recycled in this slice
 
 Commands: package scripts test and start from packages/cursor-gateway.
