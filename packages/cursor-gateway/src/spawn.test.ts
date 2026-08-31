@@ -74,3 +74,16 @@ describe("spawnCursorAgent", () => {
     expect(env.CURSOR_API_KEY).toBe("cursor-secret");
   });
 });
+
+describe("buildAgentArgs Fast-off", () => {
+  it("coerces fast=true at spawn even if config was skipped", () => {
+    const args = buildAgentArgs({
+      workspace: "/tmp/ws",
+      model: "grok-4.6[effort=high,fast=true]",
+      prompt: "Hello",
+    });
+    expect(args).toContain("grok-4.6[effort=high,fast=false]");
+    expect(args.join(" ")).not.toMatch(/fast\s*=\s*true/);
+    expect(args).not.toContain("--force");
+  });
+});

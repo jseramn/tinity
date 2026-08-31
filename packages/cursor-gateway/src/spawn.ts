@@ -1,4 +1,5 @@
 import { spawn, type ChildProcess, type SpawnOptions } from "node:child_process";
+import { resolveModel } from "./config";
 
 export type SpawnImpl = (
   command: string,
@@ -39,7 +40,7 @@ export function buildAgentArgs(input: {
     "--workspace",
     input.workspace,
     "--model",
-    input.model,
+    resolveModel(input.model),
     input.prompt,
   ];
 }

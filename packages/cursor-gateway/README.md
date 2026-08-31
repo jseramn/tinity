@@ -52,7 +52,7 @@ Missing or empty messages: 400. Concurrent job: 409.
 
 ## Known limits
 
-- Spawn has no --force
+- Spawn has no --force; spawn also coerces fast=false
 - Prompt is last argv (length limits)
 - streamChild still emits thinking-like assistant deltas as SSE
 - Not a Vercel Function

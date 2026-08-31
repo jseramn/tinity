@@ -169,9 +169,13 @@ describe("sse and mutex", () => {
     expect(busyBody.workspace).toBe("/tmp/ws");
     expect(busyBody.model).not.toMatch(/fast\s*=\s*true/i);
     const second = await call(port, "POST", "/v1/chat/completions", {
+      model: "grok-4.6[effort=low,fast=true]",
       messages: [{ role: "user", content: "Nope" }],
     });
     expect(second.status).toBe(409);
+    expect(capture).toHaveLength(1);
+    expect(capture[0]?.args.join(" ")).not.toMatch(/fast\s*=\s*true/);
+    expect(capture[0]?.args).toContain("grok-4.6[effort=high,fast=false]");
     fake.release();
     const done = await first;
     expect(done.status).toBe(200);
