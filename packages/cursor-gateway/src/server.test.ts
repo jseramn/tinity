@@ -101,6 +101,24 @@ describe("cursor-gateway http", () => {
     expect(body.model).not.toMatch(/fast\s*=\s*true/i);
   });
 
+  it("lists wrap model on GET /v1/models without spawning", async () => {
+    const g = await startGateway();
+    servers.push(g.server);
+    const res = await call(g.port, "GET", "/v1/models");
+    expect(res.status).toBe(200);
+    const body = JSON.parse(res.text) as {
+      object: string;
+      data: { id: string; object: string; owned_by: string }[];
+    };
+    expect(body.object).toBe("list");
+    expect(body.data).toHaveLength(1);
+    expect(body.data[0]?.id).toBe("grok-4.6[effort=high,fast=false]");
+    expect(body.data[0]?.id).not.toMatch(/fast\s*=\s*true/i);
+    expect(body.data[0]?.object).toBe("model");
+    expect(body.data[0]?.owned_by).toBe("tinity");
+    expect(g.capture).toHaveLength(0);
+  });
+
   it("collects non-stream completions from mocked stream-json", async () => {
     const g = await startGateway();
     servers.push(g.server);

@@ -36,6 +36,7 @@ No --force. Prompt is the last argv token. One job at a time. Busy POST returns 
 ## Endpoints
 
 - GET /health -> {ok, version, busy, workspace, model}
+- GET /v1/models -> OpenAI list of wrap model (never Fast), no spawn
 - POST /v1/chat/completions (messages[], stream)
 
 Request model is ignored. Spawn always uses wrap config (high, never Fast).
@@ -50,6 +51,7 @@ Missing or empty messages: 400. Concurrent job: 409. Prompt over 100000 chars: 4
 - One job; 409 while busy
 - Prompt over 100000 chars: 413, no spawn
 - Health includes workspace and model; model never Fast
+- GET /v1/models lists wrap model; never Fast; no spawn
 
 ## Known limits
 

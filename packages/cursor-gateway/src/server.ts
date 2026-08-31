@@ -11,6 +11,7 @@ import {
   type SpawnImpl,
 } from "./spawn";
 import { collectChild, streamChild } from "./child-io";
+import { modelsList } from "./openai";
 
 export type GatewayDeps = {
   config: GatewayConfig;
@@ -143,6 +144,11 @@ async function handleRequest(
       workspace: config.workspace,
       model: config.model,
     });
+    return;
+  }
+
+  if (req.method === "GET" && path === "/v1/models") {
+    json(res, 200, modelsList(config.model));
     return;
   }
 

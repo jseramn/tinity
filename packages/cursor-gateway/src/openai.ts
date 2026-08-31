@@ -40,3 +40,17 @@ export function chunkObject(input: {
 export function writeSse(res: ServerResponse, data: unknown): void {
   res.write(`data: ${JSON.stringify(data)}\n\n`);
 }
+
+export function modelsList(model: string) {
+  return {
+    object: "list",
+    data: [
+      {
+        id: model,
+        object: "model",
+        created: 0,
+        owned_by: "tinity",
+      },
+    ],
+  };
+}
