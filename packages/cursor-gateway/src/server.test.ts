@@ -93,6 +93,7 @@ describe("cursor-gateway http", () => {
       workspace: string;
       model: string;
       jobTimeoutMs: number;
+      fast: boolean;
     };
     expect(body.ok).toBe(true);
     expect(body.version).toMatch(/^\d+\.\d+\.\d+/);
@@ -101,6 +102,7 @@ describe("cursor-gateway http", () => {
     expect(body.model).toBe("grok-4.6[effort=high,fast=false]");
     expect(body.model).not.toMatch(/fast\s*=\s*true/i);
     expect(body.jobTimeoutMs).toBe(600000);
+    expect(body.fast).toBe(false);
   });
 
   it("lists wrap model on GET /v1/models without spawning", async () => {
@@ -184,10 +186,16 @@ describe("sse and mutex", () => {
     });
     await new Promise((r) => setTimeout(r, 25));
     const health = await call(port, "GET", "/health");
-    const busyBody = JSON.parse(health.text) as { busy: boolean; workspace: string; model: string };
+    const busyBody = JSON.parse(health.text) as {
+      busy: boolean;
+      workspace: string;
+      model: string;
+      fast: boolean;
+    };
     expect(busyBody.busy).toBe(true);
     expect(busyBody.workspace).toBe("/tmp/ws");
     expect(busyBody.model).not.toMatch(/fast\s*=\s*true/i);
+    expect(busyBody.fast).toBe(false);
     const second = await call(port, "POST", "/v1/chat/completions", {
       model: "grok-4.6[effort=low,fast=true]",
       messages: [{ role: "user", content: "Nope" }],

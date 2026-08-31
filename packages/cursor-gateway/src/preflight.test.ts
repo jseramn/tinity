@@ -187,6 +187,49 @@ describe("inspectHealth", () => {
       ),
     ).toEqual({ ok: false, reason: "health-stale" });
   });
+
+  it("treats explicit fast true as Fast and invalid fast as stale", () => {
+    expect(
+      inspectHealth(
+        {
+          ok: true,
+          busy: false,
+          workspace: "/home/jseramn/tinity",
+          model: "grok-4.6[effort=high,fast=false]",
+          fast: false,
+        },
+        "/home/jseramn/tinity",
+      ),
+    ).toEqual({
+      ok: true,
+      workspace: "/home/jseramn/tinity",
+      model: "grok-4.6[effort=high,fast=false]",
+    });
+    expect(
+      inspectHealth(
+        {
+          ok: true,
+          busy: false,
+          workspace: "/home/jseramn/tinity",
+          model: "grok-4.6[effort=high,fast=false]",
+          fast: true,
+        },
+        "/home/jseramn/tinity",
+      ),
+    ).toEqual({ ok: false, reason: "fast-model" });
+    expect(
+      inspectHealth(
+        {
+          ok: true,
+          busy: false,
+          workspace: "/home/jseramn/tinity",
+          model: "grok-4.6[effort=high,fast=false]",
+          fast: "no",
+        },
+        "/home/jseramn/tinity",
+      ),
+    ).toEqual({ ok: false, reason: "health-stale" });
+  });
 });
 
 describe("inspectModelsList", () => {

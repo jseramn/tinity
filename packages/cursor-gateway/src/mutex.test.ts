@@ -12,4 +12,18 @@ describe("JobMutex", () => {
     expect(mutex.busy).toBe(false);
     expect(mutex.tryAcquire()).toBe(true);
   });
+
+  it("double release stays idle and a failed acquire does not steal", () => {
+    const mutex = new JobMutex();
+    mutex.release();
+    mutex.release();
+    expect(mutex.busy).toBe(false);
+    expect(mutex.tryAcquire()).toBe(true);
+    expect(mutex.tryAcquire()).toBe(false);
+    expect(mutex.busy).toBe(true);
+    mutex.release();
+    mutex.release();
+    expect(mutex.busy).toBe(false);
+    expect(mutex.tryAcquire()).toBe(true);
+  });
 });

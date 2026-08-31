@@ -9,6 +9,7 @@ export type HealthBody = {
   workspace?: unknown;
   model?: unknown;
   jobTimeoutMs?: unknown;
+  fast?: unknown;
 };
 
 export type ModelsBody = {
@@ -52,6 +53,10 @@ export function inspectHealth(body: HealthBody, expectedWorkspace: string): Pref
     return { ok: false, reason: "health-stale" };
   }
   if (isFastModel(model)) return { ok: false, reason: "fast-model" };
+  if (body.fast !== undefined) {
+    if (typeof body.fast !== "boolean") return { ok: false, reason: "health-stale" };
+    if (body.fast) return { ok: false, reason: "fast-model" };
+  }
   if (body.busy === true) return { ok: false, reason: "busy" };
   const expected = normalizeWorkspace(expectedWorkspace);
   if (expected.length === 0 || workspace !== expected) {
