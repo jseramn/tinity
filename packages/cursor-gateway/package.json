@@ -7,7 +7,8 @@
   "scripts": {
     "test": "vitest run",
     "start": "tsx src/index.ts",
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "preflight": "tsx src/preflight-cli.ts"
   },
   "devDependencies": {
     "@types/node": "^26.4.0",

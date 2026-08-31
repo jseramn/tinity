@@ -10,9 +10,11 @@ Bind: 127.0.0.1:4390 (3000 Hermes WhatsApp, 18789 OpenClaw, 7437 Engram).
 
 From repo root. Package node_modules is already present; do not install.
 
-Use package scripts test and start. See package.json.
+Use package scripts test, start, and preflight. See package.json.
 
-Tests mock spawn and must not fire a live Grok job.
+Tests mock spawn and the preflight CLI. They must not fire a live Grok job or POST :4390.
+
+preflight prints one JSON line (preflightWrap) and exits 0 on ok, 1 on refuse. No spawn. No POST.
 
 ## Env
 
@@ -41,7 +43,7 @@ No --force. Prompt is the last argv token. One job at a time. Busy POST returns 
 - POST /v1/chat/completions (messages[], stream)
 
 Request model is ignored. Spawn always uses wrap config (high, never Fast).
-Harnesses MUST preflight GET /health then GET /v1/models before POST (inspectHealth / inspectModelsList / preflightWrap): require workspace+model with explicit fast=false, refuse busy, stale health, models 404, workspace mismatch, or Fast. HTTP timeout 2000ms. Do not send Casos work to a wrap bound to another tree.
+Harnesses MUST preflight GET /health then GET /v1/models before POST (inspectHealth / inspectModelsList / preflightWrap, or package script preflight): require workspace+model with explicit fast=false, refuse busy, stale health, models 404, workspace mismatch, or Fast. HTTP timeout 2000ms. Do not send Casos work to a wrap bound to another tree.
 Missing or empty messages: 400. Concurrent job: 409. Prompt over 100000 chars: 413, no spawn. Hung child past CURSOR_AGENT_TIMEOUT_MS: 504, mutex released.
 
 ## Invariants tests lock
@@ -55,6 +57,7 @@ Missing or empty messages: 400. Concurrent job: 409. Prompt over 100000 chars: 4
 - GET /v1/models lists wrap model; never Fast; no spawn
 - preflight refuses stale health, models 404, busy, workspace mismatch, Fast, model without fast=false, health.fast true, or invalid jobTimeoutMs; missing jobTimeoutMs or fast is live-old ok
 - Hung child past job timeout: 504, mutex released
+- preflight CLI prints JSON, exits 0/1, no spawn, no POST
 
 ## Known limits
 
@@ -64,4 +67,4 @@ Missing or empty messages: 400. Concurrent job: 409. Prompt over 100000 chars: 4
 - Not a Vercel Function
 - Default job timeout 600000ms (CURSOR_AGENT_TIMEOUT_MS); GET /health exposes jobTimeoutMs
 
-Commands: package scripts test and start from packages/cursor-gateway.
+Commands: package scripts test, start, and preflight from packages/cursor-gateway.
