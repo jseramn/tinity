@@ -2,7 +2,7 @@ schema: spec-driven
 
 context: |
   Project: tinity — engineering agentic system for AI harness infrastructure.
-  State: Vite + React 19 + Vitest under landing/.
+  State: landing/ (Vite + React 19 + Vitest) plus packages/cursor-gateway (local cursor-agent HTTP wrap). Product is not landing-only.
   Brand: Geist Sans/Mono, 4px grid, dark-first, accent #1fdb12 (see landing/DESIGN.md).
   Persistence: hybrid (openspec/ + Engram project tinity).
   Artifact language: English. Review budget: 400 authored lines.
