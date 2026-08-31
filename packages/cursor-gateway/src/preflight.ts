@@ -1,11 +1,18 @@
 import http from "node:http";
 
+export const PREFLIGHT_TIMEOUT_MS = 2000;
+
 export type HealthBody = {
   ok?: unknown;
   version?: unknown;
   busy?: unknown;
   workspace?: unknown;
   model?: unknown;
+};
+
+export type ModelsBody = {
+  object?: unknown;
+  data?: unknown;
 };
 
 export type PreflightOk = {
@@ -21,18 +28,52 @@ export type PreflightErr = {
 
 export type Preflight = PreflightOk | PreflightErr;
 
+export function normalizeWorkspace(path: string): string {
+  const trimmed = path.trim();
+  if (trimmed === "" || trimmed === "/") return trimmed;
+  return trimmed.replace(/\/+$/, "");
+}
+
+export function isFastModel(model: string): boolean {
+  if (/fast\s*=\s*true/i.test(model)) return true;
+  return !/fast\s*=\s*false/i.test(model);
+}
+
 export function inspectHealth(body: HealthBody, expectedWorkspace: string): Preflight {
   if (body.ok !== true) return { ok: false, reason: "health-stale" };
-  if (typeof body.workspace !== "string" || body.workspace.length === 0) {
+  if (typeof body.workspace !== "string" || typeof body.model !== "string") {
     return { ok: false, reason: "health-stale" };
   }
-  if (typeof body.model !== "string" || body.model.length === 0) {
+  const workspace = normalizeWorkspace(body.workspace);
+  const model = body.model.trim();
+  if (workspace.length === 0 || model.length === 0) {
     return { ok: false, reason: "health-stale" };
   }
-  if (/fast\s*=\s*true/i.test(body.model)) return { ok: false, reason: "fast-model" };
+  if (isFastModel(model)) return { ok: false, reason: "fast-model" };
   if (body.busy === true) return { ok: false, reason: "busy" };
-  if (body.workspace !== expectedWorkspace) return { ok: false, reason: "workspace-mismatch" };
-  return { ok: true, workspace: body.workspace, model: body.model };
+  const expected = normalizeWorkspace(expectedWorkspace);
+  if (expected.length === 0 || workspace !== expected) {
+    return { ok: false, reason: "workspace-mismatch" };
+  }
+  return { ok: true, workspace, model };
+}
+
+export function inspectModelsList(
+  body: ModelsBody,
+  expectedModel: string,
+): PreflightErr | { ok: true } {
+  if (body.object !== "list" || !Array.isArray(body.data) || body.data.length === 0) {
+    return { ok: false, reason: "health-stale" };
+  }
+  const first = body.data[0];
+  if (!first || typeof first !== "object") return { ok: false, reason: "health-stale" };
+  const id = (first as { id?: unknown }).id;
+  if (typeof id !== "string" || id.length === 0) {
+    return { ok: false, reason: "health-stale" };
+  }
+  if (isFastModel(id)) return { ok: false, reason: "fast-model" };
+  if (id !== expectedModel) return { ok: false, reason: "health-stale" };
+  return { ok: true };
 }
 
 export async function preflightWrap(input: {
@@ -41,31 +82,55 @@ export async function preflightWrap(input: {
   host?: string;
 }): Promise<Preflight> {
   const host = input.host ?? "127.0.0.1";
-  let raw: string;
+  let healthRes: { status: number; text: string };
   try {
-    raw = await getHealth(host, input.port);
+    healthRes = await getPath(host, input.port, "/health");
   } catch {
     return { ok: false, reason: "unreachable" };
   }
-  let body: HealthBody;
+  if (healthRes.status !== 200) return { ok: false, reason: "health-stale" };
+  let healthBody: HealthBody;
   try {
-    body = JSON.parse(raw) as HealthBody;
+    healthBody = JSON.parse(healthRes.text) as HealthBody;
   } catch {
     return { ok: false, reason: "health-stale" };
   }
-  return inspectHealth(body, input.expectedWorkspace);
+  const health = inspectHealth(healthBody, input.expectedWorkspace);
+  if (!health.ok) return health;
+
+  let modelsRes: { status: number; text: string };
+  try {
+    modelsRes = await getPath(host, input.port, "/v1/models");
+  } catch {
+    return { ok: false, reason: "health-stale" };
+  }
+  if (modelsRes.status !== 200) return { ok: false, reason: "health-stale" };
+  let modelsBody: ModelsBody;
+  try {
+    modelsBody = JSON.parse(modelsRes.text) as ModelsBody;
+  } catch {
+    return { ok: false, reason: "health-stale" };
+  }
+  const models = inspectModelsList(modelsBody, health.model);
+  if (!models.ok) return models;
+  return health;
 }
 
-function getHealth(host: string, port: number): Promise<string> {
+function getPath(host: string, port: number, path: string): Promise<{ status: number; text: string }> {
   return new Promise((resolve, reject) => {
-    const req = http.request(
-      { host, port, path: "/health", method: "GET" },
-      (res) => {
-        const chunks: Buffer[] = [];
-        res.on("data", (c: Buffer) => chunks.push(c));
-        res.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
-      },
-    );
+    const req = http.request({ host, port, path, method: "GET" }, (res) => {
+      const chunks: Buffer[] = [];
+      res.on("data", (c: Buffer) => chunks.push(c));
+      res.on("end", () =>
+        resolve({
+          status: res.statusCode ?? 0,
+          text: Buffer.concat(chunks).toString("utf8"),
+        }),
+      );
+    });
+    req.setTimeout(PREFLIGHT_TIMEOUT_MS, () => {
+      req.destroy(new Error("timeout"));
+    });
     req.on("error", reject);
     req.end();
   });
