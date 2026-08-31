@@ -29,7 +29,7 @@ New: this OpenSpec folder, packages/cursor-gateway/, workspace yaml, .npmrc, roo
 
 ## Interfaces / Contracts
 
-GET /health -> {ok, version, busy}. POST /v1/chat/completions with messages[] and stream. Spawn argv: -p --output-format stream-json --trust --workspace --model plus prompt.
+GET /health -> {ok, version, busy, workspace, model}. workspace is the spawn --workspace path. model is wrap config after Fast-off. POST /v1/chat/completions with messages[] and stream. Spawn argv: -p --output-format stream-json --trust --workspace --model plus prompt.
 
 stream-json: assistant text -> OpenAI delta; result -> stop; unknown JSON SHOULD pass through parseable assistant text.
 

@@ -11,7 +11,7 @@ Estimated changed lines: ~700-900 authored. 400-line budget risk: High (size:exc
 
 ## Phase 2: Tests First
 
-- [x] 2.1 Health {ok, version, busy}; bind 127.0.0.1; default port 4390.
+- [x] 2.1 Health {ok, version, busy, workspace, model}; bind 127.0.0.1; default port 4390.
 - [x] 2.2 Mutex 409 while busy; health busy true during a held spawn.
 - [x] 2.3 Spawn argv includes -p, stream-json, --trust, --workspace, model grok-4.6[effort=high,fast=false]; never Fast.
 - [x] 2.4 Prompt = last user + optional system; SSE vs non-stream collect; mock spawn only.

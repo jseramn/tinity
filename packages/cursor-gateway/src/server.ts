@@ -140,6 +140,8 @@ async function handleRequest(
       ok: true,
       version: config.version,
       busy: mutex.busy,
+      workspace: config.workspace,
+      model: config.model,
     });
     return;
   }

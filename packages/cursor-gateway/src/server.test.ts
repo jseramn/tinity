@@ -86,10 +86,19 @@ describe("cursor-gateway http", () => {
     expect(g.config.port).toBe(4390);
     const res = await call(g.port, "GET", "/health");
     expect(res.status).toBe(200);
-    const body = JSON.parse(res.text) as { ok: boolean; version: string; busy: boolean };
+    const body = JSON.parse(res.text) as {
+      ok: boolean;
+      version: string;
+      busy: boolean;
+      workspace: string;
+      model: string;
+    };
     expect(body.ok).toBe(true);
     expect(body.version).toMatch(/^\d+\.\d+\.\d+/);
     expect(body.busy).toBe(false);
+    expect(body.workspace).toBe("/home/jseramn/tinity");
+    expect(body.model).toBe("grok-4.6[effort=high,fast=false]");
+    expect(body.model).not.toMatch(/fast\s*=\s*true/i);
   });
 
   it("collects non-stream completions from mocked stream-json", async () => {
@@ -155,7 +164,10 @@ describe("sse and mutex", () => {
     });
     await new Promise((r) => setTimeout(r, 25));
     const health = await call(port, "GET", "/health");
-    expect(JSON.parse(health.text).busy).toBe(true);
+    const busyBody = JSON.parse(health.text) as { busy: boolean; workspace: string; model: string };
+    expect(busyBody.busy).toBe(true);
+    expect(busyBody.workspace).toBe("/tmp/ws");
+    expect(busyBody.model).not.toMatch(/fast\s*=\s*true/i);
     const second = await call(port, "POST", "/v1/chat/completions", {
       messages: [{ role: "user", content: "Nope" }],
     });
