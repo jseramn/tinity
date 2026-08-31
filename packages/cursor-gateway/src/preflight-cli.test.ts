@@ -45,4 +45,15 @@ describe("runPreflightCli", () => {
     expect(code).toBe(1);
     expect(JSON.parse(lines[0]!)).toEqual({ ok: false, reason: "unreachable" });
   });
+
+  it("prints busy retry_after and returns 1", async () => {
+    const lines: string[] = [];
+    const code = await runPreflightCli({
+      env: { CURSOR_GATEWAY_PORT: "4390", CURSOR_AGENT_WORKSPACE: "/tmp/ws" },
+      preflight: async () => ({ ok: false, reason: "busy", retry_after: 1 }),
+      write: (line) => lines.push(line),
+    });
+    expect(code).toBe(1);
+    expect(JSON.parse(lines[0]!)).toEqual({ ok: false, reason: "busy", retry_after: 1 });
+  });
 });

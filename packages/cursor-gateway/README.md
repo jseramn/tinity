@@ -43,7 +43,7 @@ No --force. Prompt is the last argv token. One job at a time. Busy POST returns 
 - POST /v1/chat/completions (messages[], stream)
 
 Request model is ignored. Spawn always uses wrap config (high, never Fast).
-Harnesses MUST preflight GET /health then GET /v1/models before POST (inspectHealth / inspectModelsList / preflightWrap, or package script preflight): require workspace+model with explicit fast=false, refuse busy, stale health, models 404, workspace mismatch, or Fast. HTTP timeout 2000ms. Ok forwards jobTimeoutMs and fast when present. Do not send Casos work to a wrap bound to another tree.
+Harnesses MUST preflight GET /health then GET /v1/models before POST (inspectHealth / inspectModelsList / preflightWrap, or package script preflight): require workspace+model with explicit fast=false, refuse busy (retry_after: 1), stale health, models 404, workspace mismatch, or Fast. HTTP timeout 2000ms. Ok forwards jobTimeoutMs and fast when present. Do not send Casos work to a wrap bound to another tree.
 Missing or empty messages: 400. Concurrent job: 409 plus Retry-After: 1 and error.retry_after. Prompt over 100000 chars: 413, no spawn. Hung child past CURSOR_AGENT_TIMEOUT_MS: 504, mutex released.
 
 ## Invariants tests lock
@@ -55,7 +55,7 @@ Missing or empty messages: 400. Concurrent job: 409 plus Retry-After: 1 and erro
 - Prompt over 100000 chars: 413, no spawn
 - Health includes workspace, model, jobTimeoutMs, fast, and startedAt; model never Fast; fast is false; startedAt is stable for the process
 - GET /v1/models lists wrap model; never Fast; no spawn
-- preflight refuses stale health, models 404, busy, workspace mismatch, Fast, model without fast=false, health.fast true, or invalid jobTimeoutMs; missing jobTimeoutMs or fast is live-old ok; when present, jobTimeoutMs and fast are forwarded on ok
+- preflight refuses stale health, models 404, busy, workspace mismatch, Fast, model without fast=false, health.fast true, or invalid jobTimeoutMs; busy includes retry_after: 1; missing jobTimeoutMs or fast is live-old ok; when present, jobTimeoutMs and fast are forwarded on ok
 - Hung child past job timeout: 504, mutex released
 - SIGTERM/SIGINT: SIGTERM active child if any, release mutex, close listen
 - preflight CLI prints JSON, exits 0/1, no spawn, no POST

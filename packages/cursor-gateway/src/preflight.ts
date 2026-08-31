@@ -1,6 +1,7 @@
 import http from "node:http";
 
 export const PREFLIGHT_TIMEOUT_MS = 2000;
+export const BUSY_RETRY_AFTER_SEC = 1;
 
 export type HealthBody = {
   ok?: unknown;
@@ -28,6 +29,7 @@ export type PreflightOk = {
 export type PreflightErr = {
   ok: false;
   reason: "busy" | "workspace-mismatch" | "health-stale" | "unreachable" | "fast-model";
+  retry_after?: number;
 };
 
 export type Preflight = PreflightOk | PreflightErr;
@@ -58,7 +60,9 @@ export function inspectHealth(body: HealthBody, expectedWorkspace: string): Pref
     if (typeof body.fast !== "boolean") return { ok: false, reason: "health-stale" };
     if (body.fast) return { ok: false, reason: "fast-model" };
   }
-  if (body.busy === true) return { ok: false, reason: "busy" };
+  if (body.busy === true) {
+    return { ok: false, reason: "busy", retry_after: BUSY_RETRY_AFTER_SEC };
+  }
   const expected = normalizeWorkspace(expectedWorkspace);
   if (expected.length === 0 || workspace !== expected) {
     return { ok: false, reason: "workspace-mismatch" };

@@ -131,7 +131,7 @@ describe("inspectHealth", () => {
         },
         "/home/jseramn/tinity",
       ),
-    ).toEqual({ ok: false, reason: "busy" });
+    ).toEqual({ ok: false, reason: "busy", retry_after: 1 });
     expect(
       inspectHealth(
         {
@@ -361,5 +361,29 @@ describe("preflightWrap", () => {
     });
     const got = await preflightWrap({ port, expectedWorkspace: "/tmp/ws-preflight" });
     expect(got).toEqual({ ok: false, reason: "health-stale" });
+  });
+
+  it("returns busy with retry_after without requiring models", async () => {
+    let modelsHits = 0;
+    const port = await listenRaw((req, res) => {
+      if (req.url === "/health") {
+        res.setHeader("content-type", "application/json");
+        res.end(
+          JSON.stringify({
+            ok: true,
+            busy: true,
+            workspace: "/tmp/ws-preflight",
+            model: "grok-4.6[effort=high,fast=false]",
+          }),
+        );
+        return;
+      }
+      modelsHits += 1;
+      res.statusCode = 200;
+      res.end("{}");
+    });
+    const got = await preflightWrap({ port, expectedWorkspace: "/tmp/ws-preflight" });
+    expect(got).toEqual({ ok: false, reason: "busy", retry_after: 1 });
+    expect(modelsHits).toBe(0);
   });
 });

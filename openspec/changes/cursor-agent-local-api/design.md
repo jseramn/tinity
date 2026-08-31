@@ -21,7 +21,7 @@ TypeScript + Vitest matching landing. Listen on 127.0.0.1:4390. One in-process m
 
 ## Data Flow
 
-POST /v1/chat/completions parses messages, assembles prompt, try-acquires mutex (else 409 with Retry-After: 1 and error.retry_after), spawns cursor-agent, maps NDJSON. stream=true yields SSE; stream=false collects JSON. Mutex is released on end or error. Child past CURSOR_AGENT_TIMEOUT_MS (default 600000) is SIGTERM; non-stream clients get 504 and the mutex is released. SIGTERM/SIGINT on the wrap process SIGTERMs the active child if any, releases the mutex, and closes listen so a recycle does not pile a second :4390. Harnesses that see 409 should GET /health and retry after 1s, not wait the full job timeout.
+POST /v1/chat/completions parses messages, assembles prompt, try-acquires mutex (else 409 with Retry-After: 1 and error.retry_after), spawns cursor-agent, maps NDJSON. stream=true yields SSE; stream=false collects JSON. Mutex is released on end or error. Child past CURSOR_AGENT_TIMEOUT_MS (default 600000) is SIGTERM; non-stream clients get 504 and the mutex is released. SIGTERM/SIGINT on the wrap process SIGTERMs the active child if any, releases the mutex, and closes listen so a recycle does not pile a second :4390. Harnesses that see 409 or preflight reason busy should GET /health and retry after retry_after (1s), not wait the full job timeout.
 
 ## File Changes
 
@@ -31,7 +31,7 @@ New: this OpenSpec folder, packages/cursor-gateway/, workspace yaml, .npmrc, roo
 
 GET /health -> {ok, version, busy, workspace, model, jobTimeoutMs, fast, startedAt}. workspace is the spawn --workspace path. model is wrap config after Fast-off. fast is false. startedAt is ISO-8601 at process boot and stays put until recycle. GET /v1/models -> OpenAI list with that same model (never Fast), no spawn. POST /v1/chat/completions with messages[] and stream. Spawn argv: -p --output-format stream-json --trust --workspace --model plus prompt.
 
-Harness preflight (inspectHealth / inspectModelsList / preflightWrap) MUST GET /health then GET /v1/models. Refuse when health lacks workspace or model (live-old process), /v1/models is 404, busy, workspace mismatches the job tree, model is Fast, model omits fast=false, health.fast is true, health.fast is present and not a boolean, or jobTimeoutMs is present and not a positive number. Missing jobTimeoutMs or fast is live-old ok; when present they are forwarded on ok. HTTP timeout 2000ms. Do not POST Casos work at a wrap bound to another tree.
+Harness preflight (inspectHealth / inspectModelsList / preflightWrap) MUST GET /health then GET /v1/models. Refuse when health lacks workspace or model (live-old process), /v1/models is 404, busy (retry_after: 1), workspace mismatches the job tree, model is Fast, model omits fast=false, health.fast is true, health.fast is present and not a boolean, or jobTimeoutMs is present and not a positive number. Missing jobTimeoutMs or fast is live-old ok; when present they are forwarded on ok. HTTP timeout 2000ms. Do not POST Casos work at a wrap bound to another tree.
 
 stream-json: assistant text -> OpenAI delta; result -> stop; unknown JSON SHOULD pass through parseable assistant text.
 
