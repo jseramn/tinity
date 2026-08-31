@@ -57,6 +57,7 @@ Missing or empty messages: 400. Concurrent job: 409 plus Retry-After: 1 and erro
 - GET /v1/models lists wrap model; never Fast; no spawn
 - preflight refuses stale health, models 404, busy, workspace mismatch, Fast, model without fast=false, health.fast true, or invalid jobTimeoutMs; missing jobTimeoutMs or fast is live-old ok; when present, jobTimeoutMs and fast are forwarded on ok
 - Hung child past job timeout: 504, mutex released
+- SIGTERM/SIGINT: SIGTERM active child if any, release mutex, close listen
 - preflight CLI prints JSON, exits 0/1, no spawn, no POST
 
 ## Known limits
@@ -65,6 +66,7 @@ Missing or empty messages: 400. Concurrent job: 409 plus Retry-After: 1 and erro
 - Prompt is last argv; wrap rejects over 100000 chars with 413 before spawn
 - streamChild still emits thinking-like assistant deltas as SSE
 - Not a Vercel Function
+- Recycle with SIGTERM on the wrap process (idle or busy)
 - Default job timeout 600000ms (CURSOR_AGENT_TIMEOUT_MS); GET /health exposes jobTimeoutMs
 
 Commands: package scripts test, start, and preflight from packages/cursor-gateway.

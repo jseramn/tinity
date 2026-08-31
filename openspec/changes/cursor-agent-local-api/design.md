@@ -21,7 +21,7 @@ TypeScript + Vitest matching landing. Listen on 127.0.0.1:4390. One in-process m
 
 ## Data Flow
 
-POST /v1/chat/completions parses messages, assembles prompt, try-acquires mutex (else 409 with Retry-After: 1 and error.retry_after), spawns cursor-agent, maps NDJSON. stream=true yields SSE; stream=false collects JSON. Mutex is released on end or error. Child past CURSOR_AGENT_TIMEOUT_MS (default 600000) is SIGTERM; non-stream clients get 504 and the mutex is released. Harnesses that see 409 should GET /health and retry after 1s, not wait the full job timeout.
+POST /v1/chat/completions parses messages, assembles prompt, try-acquires mutex (else 409 with Retry-After: 1 and error.retry_after), spawns cursor-agent, maps NDJSON. stream=true yields SSE; stream=false collects JSON. Mutex is released on end or error. Child past CURSOR_AGENT_TIMEOUT_MS (default 600000) is SIGTERM; non-stream clients get 504 and the mutex is released. SIGTERM/SIGINT on the wrap process SIGTERMs the active child if any, releases the mutex, and closes listen so a recycle does not pile a second :4390. Harnesses that see 409 should GET /health and retry after 1s, not wait the full job timeout.
 
 ## File Changes
 

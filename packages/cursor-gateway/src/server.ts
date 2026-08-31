@@ -113,15 +113,39 @@ function writeSse(res: ServerResponse, data: unknown): void {
   res.write(`data: ${JSON.stringify(data)}\n\n`);
 }
 
+type ChildSlot = { current: ChildProcess | undefined };
+
+const shutdowns = new WeakMap<http.Server, () => Promise<void>>();
+
 export function createGatewayServer(deps: GatewayDeps): http.Server {
   const mutex = deps.mutex ?? new JobMutex();
   const { config } = deps;
   if (deps.spawn) setSpawnImpl(deps.spawn);
   const startedAt = (deps.now ?? (() => new Date()))().toISOString();
+  const slot: ChildSlot = { current: undefined };
 
-  return http.createServer((req, res) => {
-    void handleRequest(req, res, config, mutex, startedAt);
+  const server = http.createServer((req, res) => {
+    void handleRequest(req, res, config, mutex, startedAt, slot);
   });
+
+  shutdowns.set(server, async () => {
+    const child = slot.current;
+    if (child && !child.killed) child.kill("SIGTERM");
+    slot.current = undefined;
+    mutex.release();
+    if (server.listening) {
+      await new Promise<void>((resolve, reject) => {
+        server.close((err) => (err ? reject(err) : resolve()));
+      });
+    }
+  });
+
+  return server;
+}
+
+export async function shutdownGateway(server: http.Server): Promise<void> {
+  const fn = shutdowns.get(server);
+  if (fn) await fn();
 }
 
 export function listenLocal(
@@ -144,6 +168,7 @@ async function handleRequest(
   config: GatewayConfig,
   mutex: JobMutex,
   startedAt: string,
+  slot: ChildSlot,
 ): Promise<void> {
   const url = req.url ?? "/";
   const path = url.split("?")[0];
@@ -168,7 +193,7 @@ async function handleRequest(
   }
 
   if (req.method === "POST" && path === "/v1/chat/completions") {
-    await handleChat(req, res, config, mutex);
+    await handleChat(req, res, config, mutex, slot);
     return;
   }
 
@@ -180,6 +205,7 @@ async function handleChat(
   res: ServerResponse,
   config: GatewayConfig,
   mutex: JobMutex,
+  slot: ChildSlot,
 ): Promise<void> {
   let raw: string;
   try {
@@ -248,6 +274,7 @@ async function handleChat(
       model,
       prompt,
     });
+    slot.current = child;
   } catch (err) {
     mutex.release();
     json(res, 500, {
@@ -291,6 +318,7 @@ async function handleChat(
     }
   } finally {
     req.off("close", onAbort);
+    if (slot.current === child) slot.current = undefined;
     mutex.release();
   }
 }

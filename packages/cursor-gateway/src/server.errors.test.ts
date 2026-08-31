@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import http from "node:http";
 import { loadConfig } from "./config";
 import { JobMutex } from "./mutex";
-import { createGatewayServer, listenLocal } from "./server";
+import { createGatewayServer, listenLocal, shutdownGateway } from "./server";
 import { resetSpawnImpl } from "./spawn";
 import { createFakeChild, mockSpawn, type FakeSpawnCapture } from "./test-utils";
 import { MAX_PROMPT_CHARS } from "./prompt";
@@ -59,7 +59,15 @@ afterEach(async () => {
     servers.splice(0).map(
       (server) =>
         new Promise<void>((resolve, reject) => {
-          server.close((err) => (err ? reject(err) : resolve()));
+          server.close((err) => {
+            if (!err) {
+              resolve();
+              return;
+            }
+            const code = (err as NodeJS.ErrnoException).code;
+            if (code === "ERR_SERVER_NOT_RUNNING") resolve();
+            else reject(err);
+          });
         }),
     ),
   );
@@ -167,3 +175,46 @@ describe("cursor-gateway job timeout", () => {
   });
 });
 
+
+describe("cursor-gateway shutdown", () => {
+  it("closes listen when idle without spawning", async () => {
+    const g = await startGateway();
+    const server = servers[servers.length - 1];
+    await shutdownGateway(server);
+    await expect(call(g.port, "GET", "/health")).rejects.toMatchObject({
+      code: "ECONNREFUSED",
+    });
+    expect(g.capture).toHaveLength(0);
+  });
+
+  it("SIGTERMs a held child, releases the mutex, and closes listen", async () => {
+    const capture: FakeSpawnCapture[] = [];
+    const fake = createFakeChild({ lines: assistantLines, hold: true });
+    const spawn = mockSpawn(capture, () => fake);
+    const mutex = new JobMutex();
+    const config = loadConfig({ CURSOR_GATEWAY_PORT: "0" }, "/tmp/ws");
+    const server = createGatewayServer({ config, mutex, spawn });
+    await listenLocal(server, { host: "127.0.0.1", port: 0 });
+    servers.push(server);
+    const addr = server.address();
+    if (!addr || typeof addr === "string") throw new Error("no address");
+    const port = addr.port;
+
+    const pending = call(port, "POST", "/v1/chat/completions", {
+      messages: [{ role: "user", content: "Hello" }],
+    });
+    for (let i = 0; i < 50 && !mutex.busy; i += 1) {
+      await new Promise((r) => setTimeout(r, 10));
+    }
+    expect(mutex.busy).toBe(true);
+    expect(capture).toHaveLength(1);
+
+    await shutdownGateway(server);
+    expect(fake.child.killed).toBe(true);
+    expect(mutex.busy).toBe(false);
+    await expect(call(port, "GET", "/health")).rejects.toMatchObject({
+      code: "ECONNREFUSED",
+    });
+    await pending.catch(() => undefined);
+  });
+});
