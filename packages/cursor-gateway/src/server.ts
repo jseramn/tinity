@@ -4,7 +4,7 @@ import type { ChildProcess } from "node:child_process";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { GatewayConfig } from "./config";
 import { JobMutex } from "./mutex";
-import { assemblePrompt, type ChatMessage } from "./prompt";
+import { assemblePrompt, MAX_PROMPT_CHARS, type ChatMessage } from "./prompt";
 import {
   setSpawnImpl,
   spawnCursorAgent,
@@ -187,6 +187,12 @@ async function handleChat(
   if (!prompt.trim()) {
     json(res, 400, {
       error: { message: "prompt is empty", type: "invalid_request_error" },
+    });
+    return;
+  }
+  if (prompt.length > MAX_PROMPT_CHARS) {
+    json(res, 413, {
+      error: { message: "prompt too large", type: "invalid_request_error" },
     });
     return;
   }

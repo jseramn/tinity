@@ -40,7 +40,7 @@ No --force. Prompt is the last argv token. One job at a time. Busy POST returns 
 
 Request model is ignored. Spawn always uses wrap config (high, never Fast).
 Harnesses MUST read health.workspace before POST. Do not send Casos work to a wrap bound to another tree.
-Missing or empty messages: 400. Concurrent job: 409.
+Missing or empty messages: 400. Concurrent job: 409. Prompt over 100000 chars: 413, no spawn.
 
 ## Invariants tests lock
 
@@ -48,12 +48,13 @@ Missing or empty messages: 400. Concurrent job: 409.
 - Default model grok-4.6[effort=high,fast=false]; fast=true is coerced off
 - Child env drops AI_GATEWAY_API_KEY
 - One job; 409 while busy
+- Prompt over 100000 chars: 413, no spawn
 - Health includes workspace and model; model never Fast
 
 ## Known limits
 
 - Spawn has no --force; spawn also coerces fast=false
-- Prompt is last argv (length limits)
+- Prompt is last argv; wrap rejects over 100000 chars with 413 before spawn
 - streamChild still emits thinking-like assistant deltas as SSE
 - Not a Vercel Function
 

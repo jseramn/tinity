@@ -5,6 +5,7 @@ import { JobMutex } from "./mutex";
 import { createGatewayServer, listenLocal } from "./server";
 import { resetSpawnImpl } from "./spawn";
 import { createFakeChild, mockSpawn, type FakeSpawnCapture } from "./test-utils";
+import { MAX_PROMPT_CHARS } from "./prompt";
 
 const assistantLines = [
   JSON.stringify({
@@ -110,5 +111,15 @@ describe("cursor-gateway errors", () => {
     expect(res.status).toBe(200);
     expect(g.capture[0]?.args).toContain("grok-4.6[effort=high,fast=false]");
     expect(g.capture[0]?.args.join(" ")).not.toMatch(/fast\s*=\s*true/);
+  });
+
+  it("returns 413 when assembled prompt exceeds argv budget without spawning", async () => {
+    const g = await startGateway();
+    const res = await call(g.port, "POST", "/v1/chat/completions", {
+      model: "grok-4.6[effort=low,fast=true]",
+      messages: [{ role: "user", content: "x".repeat(MAX_PROMPT_CHARS + 1) }],
+    });
+    expect(res.status).toBe(413);
+    expect(g.capture).toHaveLength(0);
   });
 });

@@ -1,3 +1,5 @@
+export const MAX_PROMPT_CHARS = 100_000;
+
 export type ChatMessage = {
   role: string;
   content: unknown;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { assemblePrompt } from "./prompt";
+import { assemblePrompt, MAX_PROMPT_CHARS } from "./prompt";
 
 describe("assemblePrompt", () => {
   it("uses the last user text", () => {
@@ -45,5 +45,11 @@ describe("assemblePrompt", () => {
   it("returns empty when there is no user text", () => {
     expect(assemblePrompt([])).toBe("");
     expect(assemblePrompt([{ role: "assistant", content: "x" }])).toBe("");
+  });
+});
+
+describe("MAX_PROMPT_CHARS", () => {
+  it("caps argv prompt at 100000", () => {
+    expect(MAX_PROMPT_CHARS).toBe(100_000);
   });
 });
