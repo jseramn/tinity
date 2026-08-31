@@ -4,7 +4,7 @@ Tinity is an agentic systems engineering framework: a harness-of-harnesses for A
 
 ## Current state
 
-This repository ships a marketing landing only. It is a Vite React 19 page (public path `/tinity/`), not the orchestrator runtime. There is no in-tree harness, sandbox controller, or fleet scheduler yet.
+This repository ships a marketing landing under landing/ (Vite React 19, public path /tinity/) plus packages/cursor-gateway, a localhost HTTP wrap that spawns the existing cursor-agent CLI. There is not yet an in-tree sandbox controller or fleet scheduler.
 
 The public click path is idle/revealed overlay: numbered tiles plus the `tinity me` control. The manifesto string lives in `landing/src/experience/copy.ts` and is not rendered on screen.
 
@@ -14,7 +14,7 @@ The public click path is idle/revealed overlay: numbered tiles plus the `tinity 
 |-------|------|
 | Vite + React 19 | Landing app under `landing/` |
 | Vitest | Unit tests (`jsdom`, no WebGL required) |
-| pnpm | Package manager for `landing/` |
+| pnpm | Package manager for landing/ and packages/ |
 | `landing/DESIGN.md` | Brand source of truth (Geist, 4px grid, dark-first, accent `#1fdb12`) |
 | OpenSpec | Specs and archived changes under `openspec/` |
 
@@ -41,4 +41,5 @@ WebMCP hackathon work is a separate product, not this repository.
 ## Community
 
 - [Code of Conduct](CODE_OF_CONDUCT.md) (Contributor Covenant 2.1)
+- [Contributing](CONTRIBUTING.md)
 - [LICENSE](LICENSE)
