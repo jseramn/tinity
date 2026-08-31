@@ -40,7 +40,7 @@ No --force. Prompt is the last argv token. One job at a time. Busy POST returns 
 - POST /v1/chat/completions (messages[], stream)
 
 Request model is ignored. Spawn always uses wrap config (high, never Fast).
-Harnesses MUST read health.workspace before POST. Do not send Casos work to a wrap bound to another tree.
+Harnesses MUST preflight GET /health before POST (inspectHealth / preflightWrap): require workspace+model, refuse busy, stale health, workspace mismatch, or Fast. Do not send Casos work to a wrap bound to another tree.
 Missing or empty messages: 400. Concurrent job: 409. Prompt over 100000 chars: 413, no spawn.
 
 ## Invariants tests lock
@@ -52,6 +52,7 @@ Missing or empty messages: 400. Concurrent job: 409. Prompt over 100000 chars: 4
 - Prompt over 100000 chars: 413, no spawn
 - Health includes workspace and model; model never Fast
 - GET /v1/models lists wrap model; never Fast; no spawn
+- preflight refuses stale health, busy, workspace mismatch, Fast
 
 ## Known limits
 

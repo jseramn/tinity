@@ -31,6 +31,8 @@ New: this OpenSpec folder, packages/cursor-gateway/, workspace yaml, .npmrc, roo
 
 GET /health -> {ok, version, busy, workspace, model}. workspace is the spawn --workspace path. model is wrap config after Fast-off. GET /v1/models -> OpenAI list with that same model (never Fast), no spawn. POST /v1/chat/completions with messages[] and stream. Spawn argv: -p --output-format stream-json --trust --workspace --model plus prompt.
 
+Harness preflight (inspectHealth / preflightWrap) MUST GET /health first. Refuse when health lacks workspace or model (live-old process), busy, workspace mismatches the job tree, or model is Fast. Do not POST Casos work at a wrap bound to another tree.
+
 stream-json: assistant text -> OpenAI delta; result -> stop; unknown JSON SHOULD pass through parseable assistant text.
 
 ## Open Questions
