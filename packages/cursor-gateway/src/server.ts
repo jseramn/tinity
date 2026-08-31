@@ -143,6 +143,7 @@ async function handleRequest(
       busy: mutex.busy,
       workspace: config.workspace,
       model: config.model,
+      jobTimeoutMs: config.jobTimeoutMs,
     });
     return;
   }

@@ -92,6 +92,7 @@ describe("cursor-gateway http", () => {
       busy: boolean;
       workspace: string;
       model: string;
+      jobTimeoutMs: number;
     };
     expect(body.ok).toBe(true);
     expect(body.version).toMatch(/^\d+\.\d+\.\d+/);
@@ -99,6 +100,7 @@ describe("cursor-gateway http", () => {
     expect(body.workspace).toBe("/home/jseramn/tinity");
     expect(body.model).toBe("grok-4.6[effort=high,fast=false]");
     expect(body.model).not.toMatch(/fast\s*=\s*true/i);
+    expect(body.jobTimeoutMs).toBe(600000);
   });
 
   it("lists wrap model on GET /v1/models without spawning", async () => {

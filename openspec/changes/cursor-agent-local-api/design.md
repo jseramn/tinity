@@ -29,7 +29,7 @@ New: this OpenSpec folder, packages/cursor-gateway/, workspace yaml, .npmrc, roo
 
 ## Interfaces / Contracts
 
-GET /health -> {ok, version, busy, workspace, model}. workspace is the spawn --workspace path. model is wrap config after Fast-off. GET /v1/models -> OpenAI list with that same model (never Fast), no spawn. POST /v1/chat/completions with messages[] and stream. Spawn argv: -p --output-format stream-json --trust --workspace --model plus prompt.
+GET /health -> {ok, version, busy, workspace, model, jobTimeoutMs}. workspace is the spawn --workspace path. model is wrap config after Fast-off. GET /v1/models -> OpenAI list with that same model (never Fast), no spawn. POST /v1/chat/completions with messages[] and stream. Spawn argv: -p --output-format stream-json --trust --workspace --model plus prompt.
 
 Harness preflight (inspectHealth / inspectModelsList / preflightWrap) MUST GET /health then GET /v1/models. Refuse when health lacks workspace or model (live-old process), /v1/models is 404, busy, workspace mismatches the job tree, model is Fast, or model omits fast=false. HTTP timeout 2000ms. Do not POST Casos work at a wrap bound to another tree.
 
