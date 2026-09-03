@@ -1,18 +1,68 @@
 import { describe, expect, it } from "vitest";
 import { AGENTS } from "../experience/agents";
-import { HUB_CX, HUB_CY, hubLayout, spokePath } from "./hubLayout";
+import { MARK_VIEWBOX } from "./Lockup";
+import {
+  HUB_CX,
+  HUB_CY,
+  HUB_EDGE_COUNTS,
+  HUB_HALF,
+  hubLayout,
+  markHubTransform,
+  sendPath,
+  spokePath,
+} from "./hubLayout";
+
+const IDS = AGENTS.map((agent) => agent.id);
 
 describe("hubLayout", () => {
-  it("places 17 spokes at deterministic angles starting at north", () => {
-    const ids = AGENTS.map((agent) => agent.id);
-    const nodes = hubLayout(ids);
+  it("places 17 nodes on a square rack with four sectional edges", () => {
+    const nodes = hubLayout(IDS);
     expect(nodes).toHaveLength(17);
     expect(nodes[0]?.id).toBe("grok-bot");
-    expect(nodes[0]?.angle).toBeCloseTo(-Math.PI / 2, 8);
-    expect(nodes[0]?.x).toBeCloseTo(HUB_CX, 8);
-    expect(nodes[0]!.y).toBeLessThan(HUB_CY);
-    const again = hubLayout(ids);
-    expect(again.map((n) => n.angle)).toEqual(nodes.map((n) => n.angle));
-    expect(spokePath(nodes[0]!)).toMatch(/^M[\d.]+ [\d.]+ L400\.000 400\.000$/);
+    expect(nodes.filter((n) => n.edge === "north")).toHaveLength(
+      HUB_EDGE_COUNTS.north,
+    );
+    expect(nodes.filter((n) => n.edge === "east")).toHaveLength(
+      HUB_EDGE_COUNTS.east,
+    );
+    expect(nodes.filter((n) => n.edge === "south")).toHaveLength(
+      HUB_EDGE_COUNTS.south,
+    );
+    expect(nodes.filter((n) => n.edge === "west")).toHaveLength(
+      HUB_EDGE_COUNTS.west,
+    );
+    for (const node of nodes) {
+      const chebyshev = Math.max(
+        Math.abs(node.x - HUB_CX),
+        Math.abs(node.y - HUB_CY),
+      );
+      expect(chebyshev).toBeCloseTo(HUB_HALF, 8);
+    }
+    const first = nodes[0]!;
+    expect(first.edge).toBe("north");
+    expect(first.x).toBeCloseTo(HUB_CX - HUB_HALF, 8);
+    expect(first.y).toBeCloseTo(HUB_CY - HUB_HALF, 8);
+    const again = hubLayout(IDS);
+    expect(again.map((n) => `${n.edge}:${n.x}:${n.y}`)).toEqual(
+      nodes.map((n) => `${n.edge}:${n.x}:${n.y}`),
+    );
+  });
+
+  it("traces orthogonal paths that share the LED origin", () => {
+    const nodes = hubLayout(IDS);
+    const inbound = spokePath(nodes[0]!);
+    const outbound = sendPath(nodes[0]!);
+    expect(inbound).toBe("M96.000 96.000 L96.000 400.000 L400.000 400.000");
+    expect(outbound).toBe("M400.000 400.000 L96.000 400.000 L96.000 96.000");
+    expect(spokePath(nodes[1]!)).toBe(
+      "M217.600 96.000 L217.600 400.000 L400.000 400.000",
+    );
+  });
+
+  it("offsets the mark so viewBox (0,0) is the hub origin", () => {
+    expect(markHubTransform()).toContain(
+      `translate(${MARK_VIEWBOX.minX} ${MARK_VIEWBOX.minY})`,
+    );
+    expect(markHubTransform()).toMatch(/^translate\(400 400\) scale\(28\) /);
   });
 });
