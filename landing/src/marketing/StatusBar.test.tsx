@@ -17,6 +17,7 @@ describe("StatusBar", () => {
     expect(HARNESSES).toHaveLength(17);
     for (const pip of pips) {
       expect(pip).toHaveAttribute("data-status", "idle");
+      expect(pip).toHaveAttribute("aria-label", expect.stringMatching(/ — idle$/));
     }
   });
 });

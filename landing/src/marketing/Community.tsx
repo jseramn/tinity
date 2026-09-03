@@ -1,10 +1,11 @@
 import { COMMUNITY } from "../content/community";
 import { REPO_ISSUES_HREF } from "../content/version";
+import { RevealSection } from "./RevealSection";
 
 export function Community() {
   return (
-    <section
-      className="section community"
+    <RevealSection
+      className="community"
       id="community"
       aria-labelledby="community-title"
     >
@@ -35,6 +36,6 @@ export function Community() {
           Contribute
         </a>
       </div>
-    </section>
+    </RevealSection>
   );
 }

@@ -1,8 +1,10 @@
 import { HARNESSES } from "../content/harnesses";
 import { markSrcFor } from "../experience/AgentMark";
 import { usePrefersReducedMotion } from "../experience/motion";
+import { harnessTooltip } from "./harnessStatus";
 import { MarkSvg } from "./Lockup";
 import { HUB_CX, HUB_CY, hubLayout, spokePath } from "./hubLayout";
+import { RevealSection } from "./RevealSection";
 
 const SIZE = 800;
 const DOT_INDEXES = [0, 4, 8, 12];
@@ -11,7 +13,7 @@ export function Hub() {
   const reduced = usePrefersReducedMotion();
   const nodes = hubLayout(HARNESSES.map((h) => h.id));
   return (
-    <section className="section hub" id="hub" aria-labelledby="hub-title">
+    <RevealSection className="hub" id="hub" aria-labelledby="hub-title">
       <div className="section-inner">
         <p className="eyebrow" id="hub-title">
           HUB
@@ -68,6 +70,7 @@ export function Hub() {
             </g>
             {nodes.map((node) => {
               const harness = HARNESSES[node.index]!;
+              const tip = harnessTooltip(harness.label, harness.status);
               return (
                 <g
                   key={`node-${node.id}`}
@@ -75,13 +78,14 @@ export function Hub() {
                   data-status={harness.status}
                   transform={`translate(${node.x * SIZE} ${node.y * SIZE})`}
                 >
-                  <circle r="18" fill="#111111" stroke="#262626" />
+                  <title>{tip}</title>
+                  <circle r="22" fill="#111111" stroke="#262626" />
                   <image
                     href={markSrcFor(harness.id)}
-                    x="-10"
-                    y="-10"
-                    width="20"
-                    height="20"
+                    x="-12"
+                    y="-12"
+                    width="24"
+                    height="24"
                   />
                 </g>
               );
@@ -89,8 +93,19 @@ export function Hub() {
           </svg>
           <ul className="hub-stack">
             {HARNESSES.map((harness) => (
-              <li key={harness.id} data-status={harness.status}>
-                <img src={markSrcFor(harness.id)} alt="" width={20} height={20} />
+              <li
+                key={harness.id}
+                data-status={harness.status}
+                title={harnessTooltip(harness.label, harness.status)}
+              >
+                <img
+                  src={markSrcFor(harness.id)}
+                  alt=""
+                  width={24}
+                  height={24}
+                  loading="lazy"
+                  decoding="async"
+                />
                 <span>{harness.label}</span>
               </li>
             ))}
@@ -101,6 +116,6 @@ export function Hub() {
           </figcaption>
         </figure>
       </div>
-    </section>
+    </RevealSection>
   );
 }

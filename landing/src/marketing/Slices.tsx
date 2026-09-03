@@ -1,8 +1,9 @@
 import { SLICES, SLICE_BADGE } from "../content/slices";
+import { RevealSection } from "./RevealSection";
 
 export function Slices() {
   return (
-    <section className="section slices" id="slices" aria-labelledby="slices-title">
+    <RevealSection className="slices" id="slices" aria-labelledby="slices-title">
       <div className="section-inner">
         <p className="eyebrow" id="slices-title">
           SLICES
@@ -24,6 +25,6 @@ export function Slices() {
           ))}
         </ul>
       </div>
-    </section>
+    </RevealSection>
   );
 }

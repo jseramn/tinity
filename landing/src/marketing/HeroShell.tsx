@@ -1,10 +1,11 @@
 import { REPO_HREF } from "../content/version";
 import { Stage } from "../experience/Stage";
 import { Nav } from "./Nav";
-import { useWindow } from "./shell";
+import { useSurface, useWindow } from "./shell";
 
 export function HeroCaption() {
   const { open } = useWindow();
+  const { setSurface } = useSurface();
   return (
     <div className="hero-caption">
       <p className="eyebrow">TINITY / HARNESS</p>
@@ -24,6 +25,13 @@ export function HeroCaption() {
         </a>
         <button type="button" className="btn-ghost" onClick={() => open("docs")}>
           Docs · soon
+        </button>
+        <button
+          type="button"
+          className="btn-ghost btn-ghost--agent"
+          onClick={() => setSurface("agent")}
+        >
+          Agent surface
         </button>
       </div>
       <a className="scroll-hint" href="#status">

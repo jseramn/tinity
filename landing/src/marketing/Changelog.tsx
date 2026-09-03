@@ -1,12 +1,13 @@
 import { CHANGELOG, datedChangelog } from "../content/changelog";
+import { RevealSection } from "./RevealSection";
 import { useWindow } from "./shell";
 
 export function Changelog() {
   const { open } = useWindow();
   const cards = datedChangelog(CHANGELOG).slice(0, 3);
   return (
-    <section
-      className="section changelog"
+    <RevealSection
+      className="changelog"
       id="changelog"
       aria-labelledby="changelog-title"
     >
@@ -36,6 +37,6 @@ export function Changelog() {
           Full changelog
         </button>
       </div>
-    </section>
+    </RevealSection>
   );
 }

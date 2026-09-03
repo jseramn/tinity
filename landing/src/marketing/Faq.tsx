@@ -1,8 +1,9 @@
 import { FAQ } from "../content/faq";
+import { RevealSection } from "./RevealSection";
 
 export function Faq() {
   return (
-    <section className="section faq" id="faq" aria-labelledby="faq-title">
+    <RevealSection className="faq" id="faq" aria-labelledby="faq-title">
       <div className="section-inner">
         <p className="eyebrow" id="faq-title">
           FAQ
@@ -17,6 +18,6 @@ export function Faq() {
           ))}
         </div>
       </div>
-    </section>
+    </RevealSection>
   );
 }

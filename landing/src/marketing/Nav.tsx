@@ -33,6 +33,7 @@ export function Nav() {
             type="button"
             className="surface-switch-btn"
             aria-pressed={surface === "agent"}
+            title="MCP-readable markdown surface with llms.txt twins"
             onClick={() => setSurface("agent")}
           >
             AGENT
