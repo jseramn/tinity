@@ -1,132 +1,3 @@
-From 73fead97fbdf7f24bf278658eccf6f7a59a88d25 Mon Sep 17 00:00:00 2001
-From: Cursor Agent <cursoragent@cursor.com>
-Date: Thu, 3 Sep 2026 06:10:59 +0000
-Subject: [PATCH] feat(tinity): vendor the agentic marketing spine on /tinity
-
-Pull jseramn/tinity landing into src/tinity, drop the viewport lock, and
-serve markdown twins so /tinity matches the landing source of truth.
----
- .gitignore                                    |   3 +-
- README.md                                     |   5 +-
- biome.json                                    |   2 +
- design.md                                     |   6 +-
- openspec/changes/tinity-spine-sync/design.md  |  25 +
- .../changes/tinity-spine-sync/proposal.md     |  33 ++
- openspec/changes/tinity-spine-sync/tasks.md   |  15 +
- package.json                                  |   3 +-
- public/llms.txt                               |   8 +-
- public/tinity/favicon.svg                     |  46 ++
- public/tinity/tinity-mark.svg                 |  46 ++
- public/tinity/tinity-og.png                   | Bin 0 -> 20987 bytes
- scripts/sync-vercel-security-headers.mjs      |  14 +
- scripts/tinity-og.py                          | 142 +++++
- scripts/tinity-pull.mjs                       | 249 ++++++++
- scripts/tinity-pull.test.ts                   |  37 ++
- skills-lock.json                              |  41 ++
- src/layouts/Layout.astro                      |  46 +-
- src/lib/agent/html.test.ts                    |  22 +-
- src/lib/agent/markdown.test.ts                |   9 +-
- src/lib/agent/markdown.ts                     |   2 +
- src/lib/agent/skip.test.ts                    |   7 +-
- src/lib/security/siteSecurityHeaders.mjs      |   2 +
- src/lib/tinityPage.test.ts                    |  37 +-
- src/lib/tinityTwinContent.ts                  |  12 +
- src/lib/tinityTwins.test.ts                   |  28 +
- src/lib/tinityTwins.ts                        |  18 +
- src/lib/viewportLock.test.ts                  |   2 +-
- src/pages/tinity/changelog.md.ts              |   6 +
- src/pages/tinity/design.md.ts                 |   6 +
- src/pages/tinity/index.astro                  |   9 -
- src/pages/tinity/index.md.ts                  |   6 +
- src/pages/tinity/llms.txt.ts                  |   6 +
- src/tinity/.tinity-source.json                |  80 +++
- src/tinity/App.tsx                            |  45 +-
- src/tinity/TinityApp.tsx                      |   1 +
- src/tinity/content/changelog.json             |  33 ++
- src/tinity/content/changelog.ts               |  13 +
- src/tinity/content/community.ts               |  52 ++
- src/tinity/content/faq.ts                     |  38 ++
- src/tinity/content/harnesses.ts               |  12 +
- src/tinity/content/slices.ts                  |  63 ++
- src/tinity/content/version.ts                 |   5 +
- src/tinity/experience/AgentMark.tsx           |   4 +
- src/tinity/experience/Stage.tsx               |  11 +-
- src/tinity/marketing/AgentSurface.tsx         |  61 ++
- src/tinity/marketing/Changelog.tsx            |  41 ++
- src/tinity/marketing/Community.tsx            |  40 ++
- src/tinity/marketing/Faq.tsx                  |  22 +
- src/tinity/marketing/Footer.tsx               |  11 +
- src/tinity/marketing/HeroShell.tsx            |  46 ++
- src/tinity/marketing/Hub.tsx                  | 106 ++++
- src/tinity/marketing/Lockup.tsx               | 101 ++++
- src/tinity/marketing/Nav.tsx                  | 110 ++++
- src/tinity/marketing/Slices.tsx               |  29 +
- src/tinity/marketing/StatusBar.tsx            |  38 ++
- src/tinity/marketing/Window.tsx               |  67 +++
- src/tinity/marketing/hubLayout.ts             |  43 ++
- src/tinity/marketing/shell.tsx                | 107 ++++
- src/tinity/parity.test.ts                     |  43 ++
- src/tinity/styles/credits.css                 |   6 +-
- src/tinity/styles/marketing.css               | 545 ++++++++++++++++++
- src/tinity/styles/tokens.css                  |   9 +-
- src/tinity/twins/changelog.md                 |  34 ++
- src/tinity/twins/design.md                    | 450 +++++++++++++++
- src/tinity/twins/favicon.svg                  |  46 ++
- src/tinity/twins/index.md                     |  54 ++
- src/tinity/twins/llms.txt                     |  17 +
- src/tinity/twins/tinity-mark.svg              |  46 ++
- src/tinity/twins/tinity-og.png                | Bin 0 -> 20987 bytes
- vercel.json                                   |  34 ++
- 71 files changed, 3291 insertions(+), 65 deletions(-)
- create mode 100644 openspec/changes/tinity-spine-sync/design.md
- create mode 100644 openspec/changes/tinity-spine-sync/proposal.md
- create mode 100644 openspec/changes/tinity-spine-sync/tasks.md
- create mode 100644 public/tinity/favicon.svg
- create mode 100644 public/tinity/tinity-mark.svg
- create mode 100644 public/tinity/tinity-og.png
- create mode 100644 scripts/tinity-og.py
- create mode 100644 scripts/tinity-pull.mjs
- create mode 100644 scripts/tinity-pull.test.ts
- create mode 100644 skills-lock.json
- create mode 100644 src/lib/tinityTwinContent.ts
- create mode 100644 src/lib/tinityTwins.test.ts
- create mode 100644 src/lib/tinityTwins.ts
- create mode 100644 src/pages/tinity/changelog.md.ts
- create mode 100644 src/pages/tinity/design.md.ts
- create mode 100644 src/pages/tinity/index.md.ts
- create mode 100644 src/pages/tinity/llms.txt.ts
- create mode 100644 src/tinity/.tinity-source.json
- create mode 100644 src/tinity/content/changelog.json
- create mode 100644 src/tinity/content/changelog.ts
- create mode 100644 src/tinity/content/community.ts
- create mode 100644 src/tinity/content/faq.ts
- create mode 100644 src/tinity/content/harnesses.ts
- create mode 100644 src/tinity/content/slices.ts
- create mode 100644 src/tinity/content/version.ts
- create mode 100644 src/tinity/marketing/AgentSurface.tsx
- create mode 100644 src/tinity/marketing/Changelog.tsx
- create mode 100644 src/tinity/marketing/Community.tsx
- create mode 100644 src/tinity/marketing/Faq.tsx
- create mode 100644 src/tinity/marketing/Footer.tsx
- create mode 100644 src/tinity/marketing/HeroShell.tsx
- create mode 100644 src/tinity/marketing/Hub.tsx
- create mode 100644 src/tinity/marketing/Lockup.tsx
- create mode 100644 src/tinity/marketing/Nav.tsx
- create mode 100644 src/tinity/marketing/Slices.tsx
- create mode 100644 src/tinity/marketing/StatusBar.tsx
- create mode 100644 src/tinity/marketing/Window.tsx
- create mode 100644 src/tinity/marketing/hubLayout.ts
- create mode 100644 src/tinity/marketing/shell.tsx
- create mode 100644 src/tinity/parity.test.ts
- create mode 100644 src/tinity/styles/marketing.css
- create mode 100644 src/tinity/twins/changelog.md
- create mode 100644 src/tinity/twins/design.md
- create mode 100644 src/tinity/twins/favicon.svg
- create mode 100644 src/tinity/twins/index.md
- create mode 100644 src/tinity/twins/llms.txt
- create mode 100644 src/tinity/twins/tinity-mark.svg
- create mode 100644 src/tinity/twins/tinity-og.png
-
 diff --git a/.gitignore b/.gitignore
 index 345c3a0..c27e7da 100644
 --- a/.gitignore
@@ -1611,19 +1482,15 @@ index c0e8cf4..6cd3392 100644
  })
 diff --git a/src/lib/tinityTwinContent.ts b/src/lib/tinityTwinContent.ts
 new file mode 100644
-index 0000000..750462e
+index 0000000..d66c1e5
 --- /dev/null
 +++ b/src/lib/tinityTwinContent.ts
-@@ -0,0 +1,12 @@
+@@ -0,0 +1,8 @@
 +export const twins = {
-+  "llms.txt":
-+    "# Tinity\n\n> A harness-of-harnesses for AI testing and evaluation. Friend to all harnesses. Layer 8 will be agent-based.\n\nTinity studies, evaluates, designs, and implements infrastructure for AI harnesses. It is not a firm and not a chatbot. Current release: v0.1.0.\n\n## Files\n\n- [Overview](https://www.jseramn.tech/tinity/index.md): manifesto, slices, harness statuses\n- [Changelog](https://www.jseramn.tech/tinity/changelog.md): Keep a Changelog\n- [Design system](https://www.jseramn.tech/tinity/design.md): DESIGN.md tokens\n- [Source](https://github.com/jseramn/tinity): MIT\n\n## Optional\n\n- [Human surface](https://www.jseramn.tech/tinity/): lattice + marketing spine\n- [Agent surface](https://www.jseramn.tech/tinity/?surface=agent): same URL, markdown twin\n",
-+  "index.md":
-+    "# Tinity\n\nTinity is an agentic systems engineering framework designed to build a harness-of-harnesses infrastructure for AI testing and evaluation. MIT license. The vision is not to replace or drive any other harness out of the market. Tinity exists to be a friend to all, to work alongside other harnesses and orchestrate them, putting advanced tools in creative developers' hands. Layer 8 will be agent-based.\n\n- Version: 0.1.0\n- Repository: https://github.com/jseramn/tinity\n- License: MIT\n- Production path: https://www.jseramn.tech/tinity/\n\n## What runs today\n\n| Slice | Status |\n|-------|--------|\n| Marketing landing (Vite React 19, lattice Stage) | shipped |\n| cursor-gateway v0.1.0 (localhost OpenAI-compat wrap around cursor-agent) | shipped |\n| Connector pattern library | shipped (library only, no live Slack) |\n| OpenClaw ↔ Hermes contract | in design |\n| Policy layer 2.1 (rules, SQLite audit, CLI) | next |\n| Harness adoption over Slack | next |\n| Layer 8 (runtimes, sandboxes, fleets) | later |\n\nThere is not yet an in-tree sandbox controller or fleet scheduler.\n\n## Harnesses\n\n17 harnesses on the landing. All status `idle` until a connector reports live.\n\n| Label | Id | Status | URL |\n|-------|----|--------|-----|\n| Grok Bot | `grok-bot` | idle | https://x.ai/bot |\n| OpenClaw | `openclaw` | idle | https://openclaw.ai |\n| OpenHands | `openhands` | idle | https://openhands.dev |\n| Cursor CLI | `cursor-cli` | idle | https://cursor.com/cli |\n| Qwen Code | `qwen-code` | idle | https://qwen.ai/qwencode |\n| Claude Code | `claude-code` | idle | https://claude.com/product/claude-code |\n| Mastra Code | `mastra-code` | idle | https://mastra.ai |\n| dcode | `dcode` | idle | https://www.langchain.com/dcode |\n| Cline | `cline` | idle | https://cline.bot |\n| Crush | `crush` | idle | https://github.com/charmbracelet/crush |\n| Goose | `goose` | idle | https://block.github.io/goose |\n| Aider | `aider` | idle | https://aider.chat |\n| Grok Build | `grok-build` | idle | https://x.ai/build |\n| Cursor | `cursor` | idle | https://cursor.com |\n| Pi | `pi` | idle | https://pi.ai |\n| Hermes | `hermes` | idle | https://hermes-agent.nousresearch.com |\n| OpenCode | `opencode` | idle | https://opencode.ai |\n\n## Agent files\n\n- [llms.txt](./llms.txt)\n- [index.md](./index.md) (this page)\n- [changelog.md](./changelog.md)\n- [design.md](./design.md)\n- [README](https://github.com/jseramn/tinity/blob/main/README.md)\n",
-+  "changelog.md":
-+    "# Changelog\n\nAll notable changes to Tinity are documented in this file.\n\nThe format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),\nand this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).\n\n## [Unreleased]\n\n- Policy-layer connector library (Slice 2.0 base, no live Slack)\n- Landing v2 agentic marketing spine on `/tinity`\n\n## [0.1.0] - 2026-09-02\n\n### Added\n\n- cursor-gateway Slice 1 archived and tagged: localhost OpenAI-compat wrap around `cursor-agent` on `127.0.0.1:4390`\n\n### Changed\n\n- Landing agent marks use official raster logos instead of traced SVGs (2026-09-01)\n- Landing reference flip: tumble, thickness, and rim on epicentric cubes (2026-08-30)\n\n## [0.0.2] - 2026-09-01\n\n### Changed\n\n- Raster agent marks on the Stage cubes\n\n## [0.0.1] - 2026-08-30\n\n### Added\n\n- Landing reference flip on the occupancy-glass cubes\n",
-+  "design.md":
-+    '# Tinity — DESIGN.md\n\nAgent-readable design system.\nTinity is an engineering agentic system that studies, evaluates, designs, and implements infrastructure for AI harnesses.\n\nNot a firm. Not a chatbot. The engineer that builds the harness.\n\nFused from:\n- Vercel / Geist — grayscale precision, hairline structure, Geist pair, 4px grid\n- Cursor — one scarce accent, calm light canvas, magazine display weight\n- SpaceX — industrial labels, cinematic void, ghost outline, no chrome\n- xAI / Grok — dark-first canvas, mono eyebrows, no shadows, weight-400 display\n\nThe only chromatic voltage is `#1fdb12`. Same hex in dark and light.\n\n---\n\n## 1. Visual Theme & Atmosphere\n\nDark-first infrastructure. Light is a second skin, not the origin.\n\nMood: live harness. Quiet chassis. One LED.\n\nThe interface should feel like a runtime rack:\n- surfaces are graphite or paper\n- type is engineered, not marketed\n- the green is a status pin, not a brand wash\n\nIf you remove `#1fdb12`, the system must still hold.\nIf you flood `#1fdb12`, the system is broken.\n\nNo neon cyberpunk. No mesh gradients. No glass stacks. No second accent.\n\n---\n\n## 2. Color Palette & Roles\n\n### Accent (invariant)\n\n```\n--accent:            #1fdb12\n--accent-hover:      #18c20c\n--accent-active:     #14a80a\n--on-accent:         #061008\n--accent-wash-dark:  rgba(31, 219, 18, 0.10)\n--accent-wash-light: rgba(31, 219, 18, 0.12)\n--accent-ring:       rgba(31, 219, 18, 0.45)\n--accent-line:       #1fdb12\n```\n\nRules for `#1fdb12`:\n- Same hex in both themes. Do not lighten it for light mode. Do not desaturate it for dark mode.\n- Never use as body text, captions, or muted copy. Contrast fails on white and fights on black at small sizes.\n- Use as: primary fill, focus ring, live/online indicator, active tab tick, selection caret analog, chart series 1.\n- On-accent text and icons are always `#061008`.\n- Success state reuses `--accent`. Do not invent a second green.\n\n### Dark (default)\n\n```\n--bg:              #050505\n--bg-alt:          #0a0a0a\n--surface:         #111111\n--surface-2:       #171717\n--text:            #f5f5f5\n--text-muted:      #a3a3a3\n--text-dim:        #737373\n--border:          #262626\n--border-strong:   #3f3f3f\n--hairline:        rgba(255,255,255,0.08)\n--inverse:         #fafafa\n--on-inverse:      #0a0a0a\n```\n\n### Light\n\n```\n--bg:              #f7f7f4\n--bg-alt:          #fafaf7\n--surface:         #ffffff\n--surface-2:       #efeee8\n--text:            #171717\n--text-muted:      #525252\n--text-dim:        #737373\n--border:          #e5e5e5\n--border-strong:   #d4d4d4\n--hairline:        rgba(0,0,0,0.08)\n--inverse:         #0a0a0a\n--on-inverse:      #fafafa\n```\n\nLight canvas is warm paper (Cursor), not sterile `#ffffff` page-bleed.\nInk is Vercel `#171717`, not pure black.\n\n### Semantic (shared)\n\n```\n--danger:          #ee0000\n--danger-wash:     rgba(238,0,0,0.12)\n--warning:         #f5a623\n--info:            #0a72ef\n```\n\nInfo blue is utility only (links in docs, external refs). Never brand.\n\n---\n\n## 3. Typography Rules\n\nPair (Vercel + xAI):\n\n- **UI / display / body:** `Geist Sans` (same face as `Geist` on jseramn.tech), fallback `ui-sans-serif, system-ui, sans-serif`\n- **Code / labels / eyebrows / metrics:** `Geist Mono`, fallback `ui-monospace, SFMono-Regular, Menlo, monospace`\n\nNo serif. No third family. No italics except inline emphasis in prose.\n\nWeights: 400 default. 500 UI. 600 max. Never 700+.\n\nDisplay tracking (Vercel / xAI):\n- 72–96px → letter-spacing `-0.04em` to `-0.05em`\n- 32–48px → `-0.02em`\n- ≤24px → `0`\n\nSpaceX industrial voice lives only in mono eyebrows:\n- 11–13px Geist Mono\n- uppercase\n- letter-spacing `0.08em` to `0.12em`\n- color `--text-dim`\n- example: `HARNESS / RUNTIME`\n\nScale (px): `11 / 12 / 13 / 14 / 16 / 18 / 20 / 24 / 32 / 40 / 48 / 64 / 80`\n\nRoles:\n\n| Role            | Size | Weight | Line | Face        |\n|-----------------|------|--------|------|-------------|\n| display         | 64–80| 400–500| 1.00 | Geist Sans  |\n| h1              | 40–48| 500    | 1.10 | Geist Sans  |\n| h2              | 24–32| 500    | 1.20 | Geist Sans  |\n| body            | 16   | 400    | 1.55 | Geist Sans  |\n| ui              | 14   | 400–500| 1.40 | Geist Sans  |\n| caption         | 12–13| 400    | 1.40 | Geist Sans  |\n| eyebrow         | 11–12| 500    | 1.00 | Geist Mono  |\n| code / metric   | 13–14| 400    | 1.45 | Geist Mono  |\n\nBody line-height 1.55 marketing, 1.4 app.\n\n---\n\n## 4. Component Stylings\n\n### Buttons\n\nPrimary\n- fill `--accent` (`#1fdb12`)\n- text `--on-accent` (`#061008`)\n- radius `6px`\n- padding `8px 16px`\n- weight 500\n- hover `--accent-hover`\n- no shadow\n- no gradient\n\nSecondary\n- transparent\n- 1px `--border-strong`\n- text `--text`\n- hover surface `--surface-2`\n- SpaceX ghost when on photography / void hero: `1px solid rgba(245,245,245,0.35)`, text `--text`\n\nDanger\n- fill `--danger`, text white, same radius\n\nNever put `#1fdb12` outline + `#1fdb12` fill on the same row as two competing primaries. One primary per cluster.\n\n### Cards / panels\n\n- bg `--surface`\n- 1px `--border` (Vercel shadow-as-border allowed: `box-shadow: 0 0 0 1px var(--border)`)\n- radius `8px` app, `12px` max marketing\n- no drop shadow\n- hover: border → `--border-strong` only\n- optional accent tick: 2px left edge `#1fdb12` for live / selected / running\n\n### Inputs\n\n- 1px `--border-strong`, radius `6px`, padding `8px 12px`\n- focus: 2px ring `--accent-ring` + 1px border `--accent`\n- placeholder `--text-dim`\n- mono for IDs, hashes, cron, paths\n\n### Nav / tabs\n\n- hairline bottom\n- active item: text `--text` + 2px `#1fdb12` underline or left pip\n- inactive: `--text-muted`\n\n### Tables\n\n- hairline rows\n- header Geist Mono 12px uppercase tracked\n- numeric columns mono\n- selected row wash `--accent-wash-*`\n\n### Badges / status\n\n- `LIVE` `RUNNING` `HEALTHY` → `#1fdb12` fill or 1px `#1fdb12` + wash\n- label `--on-accent` if filled, `#1fdb12` if outline on dark\n- `FAILED` uses danger. `IDLE` uses `--text-dim`\n\n### Code blocks\n\n- Geist Mono 13\n- bg `--surface-2`\n- 1px `--border`\n- radius `8px`\n- syntax green for strings / success tokens may use `#1fdb12` sparingly\n\n---\n\n## 5. Layout Principles\n\n- Base unit: `4px`\n- Scale: `4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 96 / 128`\n- Marketing max width `1120–1200px`\n- App shell `1440px`\n- Gutter `24px` desktop, `16px` mobile\n- Section rhythm marketing: `96px`\n- Dashboard density: tight, 12–16px stack\n\nSpaceX contribution: heroes may go full-bleed void (`--bg`) with type sitting on empty canvas. No card wrapping the hero.\n\nCursor contribution: light pages keep cream field and generous air. Do not pack marketing like a terminal.\n\nVercel contribution: product UI is infrastructural. Every pixel earns.\n\n---\n\n## 6. Depth & Elevation\n\nFlat system.\n\nAllowed:\n- 1px hairline\n- 0 0 0 1px border-as-shadow\n- popover only: `0 8px 24px rgba(0,0,0,0.28)` dark / `0 8px 24px rgba(0,0,0,0.08)` light + 1px border\n\nForbidden:\n- colored glow under every card\n- glassmorphism blur stacks\n- multi-stop brand gradients\n- inner neon spread on the whole page\n\nThe green may glow once: focus ring or a 4–8px soft halo on a live node in a topology view. Not on buttons.\n\n---\n\n## 7. Do\'s and Don\'ts\n\n**Do**\n- Default to dark.\n- Use `#1fdb12` as the only brand voltage.\n- Set on-accent to `#061008`.\n- Let Geist Mono carry harness language: runtime, cron, audit, sandbox, fleet.\n- Prefer hairlines over shadows.\n- Keep one primary action per view.\n- Treat status LEDs as first-class UI.\n\n**Don\'t**\n- Recolor the accent per theme.\n- Use `#1fdb12` for paragraphs or nav wordmarks at small size.\n- Add gold, cyan, purple, or orange as brand.\n- Use radius > `12px` except true pills (`9999px`) for tags only.\n- Use font-weight > 600.\n- Imitate SpaceX photography-as-UI unless the surface is a cinematic landing.\n- Write “firm”, “agency”, or SaaS hype in the product voice.\n\n---\n\n## 8. Responsive Behavior\n\n- 768px: nav → icon + drawer. No bottom app bar unless mobile runtime console.\n- Hero type: 80 → 48 → 36.\n- Topology / fleet grids collapse to stacked live tiles.\n- Tables → key-value below 640px.\n- Keep the green pip visible at every breakpoint. Status must not disappear.\n\n---\n\n## 9. Motion\n\nVercel restraint + harness liveness.\n\n- Duration: `120ms` ui, `180ms` panel, `280ms` route\n- Easing: `cubic-bezier(0.16, 1, 0.3, 1)`\n- Prefer opacity + translateY(4px)\n- Live nodes: opacity pulse 2s on the `#1fdb12` pip only\n- No bounce. No scale-on-hover > 1.02\n\n---\n\n## 10. Voice (for UI copy)\n\nShort. Exact. Engineering.\n\nTinity studies, evaluates, designs, and implements infrastructure for AI harnesses.\n\nPreferred words: harness, runtime, sandbox, fleet, audit, schedule, isolate, persist.\nAvoid: revolutionary, magical, copilot-for-X, all-in-one, firm.\n\nEyebrow pattern: `TIVITY / HARNESS` — wait, no. Product name is **Tinity**.\nEyebrow pattern: `TINITY / HARNESS`\n\n---\n\n## 11. Agent Prompt Guide\n\nWhen generating UI for Tinity:\n\n1. Read this file. Do not invent tokens.\n2. Dark theme first. Light maps 1:1 with the same accent hex.\n3. Geist Sans + Geist Mono only.\n4. Primary fill is `#1fdb12`, label `#061008`.\n5. Hairline structure. Max radius 8–12. No card shadows.\n6. One green event per view unless it is a fleet of status pips.\n7. Uppercase mono eyebrows for section labels.\n8. Display tracking tight. Weight ≤ 600.\n\nReject: neon city, glassmorphism, second accent, Inter/Roboto as primary, purple AI clichés, rounded-2xl everywhere, green text on white body.\n\nBias: rack, LED, runtime, quiet luxury of infrastructure.\n\n---\n\n## 12. CSS starter\n\n```css\n:root {\n  --accent: #1fdb12;\n  --accent-hover: #18c20c;\n  --on-accent: #061008;\n  --bg: #050505;\n  --bg-alt: #0a0a0a;\n  --surface: #111111;\n  --text: #f5f5f5;\n  --text-muted: #a3a3a3;\n  --border: #262626;\n  --radius: 8px;\n  --font-sans: "Geist Sans", "Geist", ui-sans-serif, system-ui, sans-serif;\n  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;\n}\n\n[data-theme="light"] {\n  --bg: #f7f7f4;\n  --bg-alt: #fafaf7;\n  --surface: #ffffff;\n  --text: #171717;\n  --text-muted: #525252;\n  --border: #e5e5e5;\n}\n\nhtml, body {\n  background: var(--bg);\n  color: var(--text);\n  font-family: var(--font-sans);\n}\n```\n\n---\n\n## Token dump (machine)\n\n```json\n{\n  "name": "tinity",\n  "accent": "#1fdb12",\n  "onAccent": "#061008",\n  "dark": {\n    "bg": "#050505",\n    "surface": "#111111",\n    "text": "#f5f5f5",\n    "border": "#262626"\n  },\n  "light": {\n    "bg": "#f7f7f4",\n    "surface": "#ffffff",\n    "text": "#171717",\n    "border": "#e5e5e5"\n  },\n  "fonts": {\n    "sans": "Geist Sans",\n    "mono": "Geist Mono"\n  },\n  "radius": { "control": "6px", "panel": "8px", "max": "12px" },\n  "space": [4, 8, 12, 16, 24, 32, 48, 64, 96]\n}\n```\n\n---\n\n## 13. Marketing IA (`/tinity`)\n\nOne page. No subpages. Hash sections. Windows via `?w=`. Agent surface via `?surface=agent`.\n\n| Band | Role |\n|------|------|\n| Nav | 52px hairline. Lockup (24px mark + wordmark). HUMAN / AGENT. Ghost GitHub. Docs · soon. Under 768px: lockup + switch + menu dialog. |\n| Hero | `100svh` grid `auto 1fr auto`. Stage fills the middle. Caption: eyebrow `TINITY / HARNESS`, H1 "A friend to all harnesses.", one-line dek, ghost GitHub + Docs. `tinity me` is the only accent action. |\n| Status | `#status`. `RUNS ON v0.1.0` + 17 pips. `idle` is grayscale. `live` may use the 4–8px green halo. |\n| Hub | `#hub`. SVG ring, Tinity at center, spokes inbound. Dash-offset + a few traveling dots. `prefers-reduced-motion` is static. Mobile: stacked tiles. |\n| Slices | `#slices`. Six cells. Badges: SHIPPED fill, IN DESIGN outline, NEXT/LATER dim. |\n| Changelog | `#changelog`. Three dated cards. Full changelog opens a window. |\n| Community | `#community`. GitHub, X, Slack coming. One Contribute ghost. |\n| FAQ | `#faq`. Five `details[name=faq]`. No JS accordion. |\n| Footer | Flow credits (not fixed). MIT + version. |\n\nDo not add an 8-item mega-nav. Do not wrap the hero in a card. Do not put a second primary next to `tinity me`.\n\nWindows: one native `<dialog>`, max 720px, radius 12, 1px border plus the single allowed popover shadow, 180ms opacity + `translateY(4px)`. Backdrop `rgba(5,5,5,0.6)`.\n\n---\n\n## 14. Agent surface contract\n\nSame origin. Same URL.\n\n- `?surface=agent` sets `data-surface="agent"`. Marketing spine unmounts. Markdown twin renders with Copy page.\n- Twins: `/tinity/llms.txt`, `/tinity/index.md`, `/tinity/changelog.md`, `/tinity/design.md`.\n- `<link rel="alternate" type="text/markdown">` on the HTML shell.\n- `#tinity-state` JSON: version + harness count + status.\n- JSON-LD `SoftwareSourceCode`.\n- Stage Escape unflips only when no `dialog[open]`.\n\nPresent-tense claims are limited to shipped work: landing, cursor-gateway v0.1.0, connector library. Layer 8, eval, Slack bus, fleets, and sandboxes stay future tense.\n\nDo not conflate the internal Hermes orchestrator with the Hermes Agent landing tile.\n\n---\n\n## 15. Skill precedence\n\nInstalled project skills (`.agents/skills/`): `frontend-design`, `web-design-guidelines`, `design-taste-frontend`, `impeccable`, `dashmotion`, `svg-animations`.\n\nThis file wins on conflict.\n\n- No GSAP (or any motion library) unless a later change names it.\n- No second accent from a skill palette.\n- No em-dash rewrites of locked copy (`tinity me`, manifesto, DESIGN voice).\n- Dashmotion tokens (`#020617`, JetBrains Mono) do not replace Geist or `#050505`.\n- Taste-skill variance/motion/density dials: low variance, purposeful motion, medium density. Signature is the lattice Stage plus the hub, not a new art direction.\n',
++  "llms.txt": "# Tinity\n\n> A harness-of-harnesses for AI testing and evaluation. Friend to all harnesses. Layer 8 will be agent-based.\n\nTinity studies, evaluates, designs, and implements infrastructure for AI harnesses. It is not a firm and not a chatbot. Current release: v0.1.0.\n\n## Files\n\n- [Overview](https://www.jseramn.tech/tinity/index.md): manifesto, slices, harness statuses\n- [Changelog](https://www.jseramn.tech/tinity/changelog.md): Keep a Changelog\n- [Design system](https://www.jseramn.tech/tinity/design.md): DESIGN.md tokens\n- [Source](https://github.com/jseramn/tinity): MIT\n\n## Optional\n\n- [Human surface](https://www.jseramn.tech/tinity/): lattice + marketing spine\n- [Agent surface](https://www.jseramn.tech/tinity/?surface=agent): same URL, markdown twin\n",
++  "index.md": "# Tinity\n\nTinity is an agentic systems engineering framework designed to build a harness-of-harnesses infrastructure for AI testing and evaluation. MIT license. The vision is not to replace or drive any other harness out of the market. Tinity exists to be a friend to all, to work alongside other harnesses and orchestrate them, putting advanced tools in creative developers' hands. Layer 8 will be agent-based.\n\n- Version: 0.1.0\n- Repository: https://github.com/jseramn/tinity\n- License: MIT\n- Production path: https://www.jseramn.tech/tinity/\n\n## What runs today\n\n| Slice | Status |\n|-------|--------|\n| Marketing landing (Vite React 19, lattice Stage) | shipped |\n| cursor-gateway v0.1.0 (localhost OpenAI-compat wrap around cursor-agent) | shipped |\n| Connector pattern library | shipped (library only, no live Slack) |\n| OpenClaw ↔ Hermes contract | in design |\n| Policy layer 2.1 (rules, SQLite audit, CLI) | next |\n| Harness adoption over Slack | next |\n| Layer 8 (runtimes, sandboxes, fleets) | later |\n\nThere is not yet an in-tree sandbox controller or fleet scheduler.\n\n## Harnesses\n\n17 harnesses on the landing. All status `idle` until a connector reports live.\n\n| Label | Id | Status | URL |\n|-------|----|--------|-----|\n| Grok Bot | `grok-bot` | idle | https://x.ai/bot |\n| OpenClaw | `openclaw` | idle | https://openclaw.ai |\n| OpenHands | `openhands` | idle | https://openhands.dev |\n| Cursor CLI | `cursor-cli` | idle | https://cursor.com/cli |\n| Qwen Code | `qwen-code` | idle | https://qwen.ai/qwencode |\n| Claude Code | `claude-code` | idle | https://claude.com/product/claude-code |\n| Mastra Code | `mastra-code` | idle | https://mastra.ai |\n| dcode | `dcode` | idle | https://www.langchain.com/dcode |\n| Cline | `cline` | idle | https://cline.bot |\n| Crush | `crush` | idle | https://github.com/charmbracelet/crush |\n| Goose | `goose` | idle | https://block.github.io/goose |\n| Aider | `aider` | idle | https://aider.chat |\n| Grok Build | `grok-build` | idle | https://x.ai/build |\n| Cursor | `cursor` | idle | https://cursor.com |\n| Pi | `pi` | idle | https://pi.ai |\n| Hermes | `hermes` | idle | https://hermes-agent.nousresearch.com |\n| OpenCode | `opencode` | idle | https://opencode.ai |\n\n## Agent files\n\n- [llms.txt](./llms.txt)\n- [index.md](./index.md) (this page)\n- [changelog.md](./changelog.md)\n- [design.md](./design.md)\n- [README](https://github.com/jseramn/tinity/blob/main/README.md)\n",
++  "changelog.md": "# Changelog\n\nAll notable changes to Tinity are documented in this file.\n\nThe format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),\nand this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).\n\n## [Unreleased]\n\n- Policy-layer connector library (Slice 2.0 base, no live Slack)\n- Landing v2 agentic marketing spine on `/tinity`\n\n## [0.1.0] - 2026-09-02\n\n### Added\n\n- cursor-gateway Slice 1 archived and tagged: localhost OpenAI-compat wrap around `cursor-agent` on `127.0.0.1:4390`\n\n### Changed\n\n- Landing agent marks use official raster logos instead of traced SVGs (2026-09-01)\n- Landing reference flip: tumble, thickness, and rim on epicentric cubes (2026-08-30)\n\n## [0.0.2] - 2026-09-01\n\n### Changed\n\n- Raster agent marks on the Stage cubes\n\n## [0.0.1] - 2026-08-30\n\n### Added\n\n- Landing reference flip on the occupancy-glass cubes\n",
++  "design.md": "# Tinity — DESIGN.md\n\nAgent-readable design system.\nTinity is an engineering agentic system that studies, evaluates, designs, and implements infrastructure for AI harnesses.\n\nNot a firm. Not a chatbot. The engineer that builds the harness.\n\nFused from:\n- Vercel / Geist — grayscale precision, hairline structure, Geist pair, 4px grid\n- Cursor — one scarce accent, calm light canvas, magazine display weight\n- SpaceX — industrial labels, cinematic void, ghost outline, no chrome\n- xAI / Grok — dark-first canvas, mono eyebrows, no shadows, weight-400 display\n\nThe only chromatic voltage is `#1fdb12`. Same hex in dark and light.\n\n---\n\n## 1. Visual Theme & Atmosphere\n\nDark-first infrastructure. Light is a second skin, not the origin.\n\nMood: live harness. Quiet chassis. One LED.\n\nThe interface should feel like a runtime rack:\n- surfaces are graphite or paper\n- type is engineered, not marketed\n- the green is a status pin, not a brand wash\n\nIf you remove `#1fdb12`, the system must still hold.\nIf you flood `#1fdb12`, the system is broken.\n\nNo neon cyberpunk. No mesh gradients. No glass stacks. No second accent.\n\n---\n\n## 2. Color Palette & Roles\n\n### Accent (invariant)\n\n```\n--accent:            #1fdb12\n--accent-hover:      #18c20c\n--accent-active:     #14a80a\n--on-accent:         #061008\n--accent-wash-dark:  rgba(31, 219, 18, 0.10)\n--accent-wash-light: rgba(31, 219, 18, 0.12)\n--accent-ring:       rgba(31, 219, 18, 0.45)\n--accent-line:       #1fdb12\n```\n\nRules for `#1fdb12`:\n- Same hex in both themes. Do not lighten it for light mode. Do not desaturate it for dark mode.\n- Never use as body text, captions, or muted copy. Contrast fails on white and fights on black at small sizes.\n- Use as: primary fill, focus ring, live/online indicator, active tab tick, selection caret analog, chart series 1.\n- On-accent text and icons are always `#061008`.\n- Success state reuses `--accent`. Do not invent a second green.\n\n### Dark (default)\n\n```\n--bg:              #050505\n--bg-alt:          #0a0a0a\n--surface:         #111111\n--surface-2:       #171717\n--text:            #f5f5f5\n--text-muted:      #a3a3a3\n--text-dim:        #737373\n--border:          #262626\n--border-strong:   #3f3f3f\n--hairline:        rgba(255,255,255,0.08)\n--inverse:         #fafafa\n--on-inverse:      #0a0a0a\n```\n\n### Light\n\n```\n--bg:              #f7f7f4\n--bg-alt:          #fafaf7\n--surface:         #ffffff\n--surface-2:       #efeee8\n--text:            #171717\n--text-muted:      #525252\n--text-dim:        #737373\n--border:          #e5e5e5\n--border-strong:   #d4d4d4\n--hairline:        rgba(0,0,0,0.08)\n--inverse:         #0a0a0a\n--on-inverse:      #fafafa\n```\n\nLight canvas is warm paper (Cursor), not sterile `#ffffff` page-bleed.\nInk is Vercel `#171717`, not pure black.\n\n### Semantic (shared)\n\n```\n--danger:          #ee0000\n--danger-wash:     rgba(238,0,0,0.12)\n--warning:         #f5a623\n--info:            #0a72ef\n```\n\nInfo blue is utility only (links in docs, external refs). Never brand.\n\n---\n\n## 3. Typography Rules\n\nPair (Vercel + xAI):\n\n- **UI / display / body:** `Geist Sans` (same face as `Geist` on jseramn.tech), fallback `ui-sans-serif, system-ui, sans-serif`\n- **Code / labels / eyebrows / metrics:** `Geist Mono`, fallback `ui-monospace, SFMono-Regular, Menlo, monospace`\n\nNo serif. No third family. No italics except inline emphasis in prose.\n\nWeights: 400 default. 500 UI. 600 max. Never 700+.\n\nDisplay tracking (Vercel / xAI):\n- 72–96px → letter-spacing `-0.04em` to `-0.05em`\n- 32–48px → `-0.02em`\n- ≤24px → `0`\n\nSpaceX industrial voice lives only in mono eyebrows:\n- 11–13px Geist Mono\n- uppercase\n- letter-spacing `0.08em` to `0.12em`\n- color `--text-dim`\n- example: `HARNESS / RUNTIME`\n\nScale (px): `11 / 12 / 13 / 14 / 16 / 18 / 20 / 24 / 32 / 40 / 48 / 64 / 80`\n\nRoles:\n\n| Role            | Size | Weight | Line | Face        |\n|-----------------|------|--------|------|-------------|\n| display         | 64–80| 400–500| 1.00 | Geist Sans  |\n| h1              | 40–48| 500    | 1.10 | Geist Sans  |\n| h2              | 24–32| 500    | 1.20 | Geist Sans  |\n| body            | 16   | 400    | 1.55 | Geist Sans  |\n| ui              | 14   | 400–500| 1.40 | Geist Sans  |\n| caption         | 12–13| 400    | 1.40 | Geist Sans  |\n| eyebrow         | 11–12| 500    | 1.00 | Geist Mono  |\n| code / metric   | 13–14| 400    | 1.45 | Geist Mono  |\n\nBody line-height 1.55 marketing, 1.4 app.\n\n---\n\n## 4. Component Stylings\n\n### Buttons\n\nPrimary\n- fill `--accent` (`#1fdb12`)\n- text `--on-accent` (`#061008`)\n- radius `6px`\n- padding `8px 16px`\n- weight 500\n- hover `--accent-hover`\n- no shadow\n- no gradient\n\nSecondary\n- transparent\n- 1px `--border-strong`\n- text `--text`\n- hover surface `--surface-2`\n- SpaceX ghost when on photography / void hero: `1px solid rgba(245,245,245,0.35)`, text `--text`\n\nDanger\n- fill `--danger`, text white, same radius\n\nNever put `#1fdb12` outline + `#1fdb12` fill on the same row as two competing primaries. One primary per cluster.\n\n### Cards / panels\n\n- bg `--surface`\n- 1px `--border` (Vercel shadow-as-border allowed: `box-shadow: 0 0 0 1px var(--border)`)\n- radius `8px` app, `12px` max marketing\n- no drop shadow\n- hover: border → `--border-strong` only\n- optional accent tick: 2px left edge `#1fdb12` for live / selected / running\n\n### Inputs\n\n- 1px `--border-strong`, radius `6px`, padding `8px 12px`\n- focus: 2px ring `--accent-ring` + 1px border `--accent`\n- placeholder `--text-dim`\n- mono for IDs, hashes, cron, paths\n\n### Nav / tabs\n\n- hairline bottom\n- active item: text `--text` + 2px `#1fdb12` underline or left pip\n- inactive: `--text-muted`\n\n### Tables\n\n- hairline rows\n- header Geist Mono 12px uppercase tracked\n- numeric columns mono\n- selected row wash `--accent-wash-*`\n\n### Badges / status\n\n- `LIVE` `RUNNING` `HEALTHY` → `#1fdb12` fill or 1px `#1fdb12` + wash\n- label `--on-accent` if filled, `#1fdb12` if outline on dark\n- `FAILED` uses danger. `IDLE` uses `--text-dim`\n\n### Code blocks\n\n- Geist Mono 13\n- bg `--surface-2`\n- 1px `--border`\n- radius `8px`\n- syntax green for strings / success tokens may use `#1fdb12` sparingly\n\n---\n\n## 5. Layout Principles\n\n- Base unit: `4px`\n- Scale: `4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 96 / 128`\n- Marketing max width `1120–1200px`\n- App shell `1440px`\n- Gutter `24px` desktop, `16px` mobile\n- Section rhythm marketing: `96px`\n- Dashboard density: tight, 12–16px stack\n\nSpaceX contribution: heroes may go full-bleed void (`--bg`) with type sitting on empty canvas. No card wrapping the hero.\n\nCursor contribution: light pages keep cream field and generous air. Do not pack marketing like a terminal.\n\nVercel contribution: product UI is infrastructural. Every pixel earns.\n\n---\n\n## 6. Depth & Elevation\n\nFlat system.\n\nAllowed:\n- 1px hairline\n- 0 0 0 1px border-as-shadow\n- popover only: `0 8px 24px rgba(0,0,0,0.28)` dark / `0 8px 24px rgba(0,0,0,0.08)` light + 1px border\n\nForbidden:\n- colored glow under every card\n- glassmorphism blur stacks\n- multi-stop brand gradients\n- inner neon spread on the whole page\n\nThe green may glow once: focus ring or a 4–8px soft halo on a live node in a topology view. Not on buttons.\n\n---\n\n## 7. Do's and Don'ts\n\n**Do**\n- Default to dark.\n- Use `#1fdb12` as the only brand voltage.\n- Set on-accent to `#061008`.\n- Let Geist Mono carry harness language: runtime, cron, audit, sandbox, fleet.\n- Prefer hairlines over shadows.\n- Keep one primary action per view.\n- Treat status LEDs as first-class UI.\n\n**Don't**\n- Recolor the accent per theme.\n- Use `#1fdb12` for paragraphs or nav wordmarks at small size.\n- Add gold, cyan, purple, or orange as brand.\n- Use radius > `12px` except true pills (`9999px`) for tags only.\n- Use font-weight > 600.\n- Imitate SpaceX photography-as-UI unless the surface is a cinematic landing.\n- Write “firm”, “agency”, or SaaS hype in the product voice.\n\n---\n\n## 8. Responsive Behavior\n\n- 768px: nav → icon + drawer. No bottom app bar unless mobile runtime console.\n- Hero type: 80 → 48 → 36.\n- Topology / fleet grids collapse to stacked live tiles.\n- Tables → key-value below 640px.\n- Keep the green pip visible at every breakpoint. Status must not disappear.\n\n---\n\n## 9. Motion\n\nVercel restraint + harness liveness.\n\n- Duration: `120ms` ui, `180ms` panel, `280ms` route\n- Easing: `cubic-bezier(0.16, 1, 0.3, 1)`\n- Prefer opacity + translateY(4px)\n- Live nodes: opacity pulse 2s on the `#1fdb12` pip only\n- No bounce. No scale-on-hover > 1.02\n\n---\n\n## 10. Voice (for UI copy)\n\nShort. Exact. Engineering.\n\nTinity studies, evaluates, designs, and implements infrastructure for AI harnesses.\n\nPreferred words: harness, runtime, sandbox, fleet, audit, schedule, isolate, persist.\nAvoid: revolutionary, magical, copilot-for-X, all-in-one, firm.\n\nEyebrow pattern: `TIVITY / HARNESS` — wait, no. Product name is **Tinity**.\nEyebrow pattern: `TINITY / HARNESS`\n\n---\n\n## 11. Agent Prompt Guide\n\nWhen generating UI for Tinity:\n\n1. Read this file. Do not invent tokens.\n2. Dark theme first. Light maps 1:1 with the same accent hex.\n3. Geist Sans + Geist Mono only.\n4. Primary fill is `#1fdb12`, label `#061008`.\n5. Hairline structure. Max radius 8–12. No card shadows.\n6. One green event per view unless it is a fleet of status pips.\n7. Uppercase mono eyebrows for section labels.\n8. Display tracking tight. Weight ≤ 600.\n\nReject: neon city, glassmorphism, second accent, Inter/Roboto as primary, purple AI clichés, rounded-2xl everywhere, green text on white body.\n\nBias: rack, LED, runtime, quiet luxury of infrastructure.\n\n---\n\n## 12. CSS starter\n\n```css\n:root {\n  --accent: #1fdb12;\n  --accent-hover: #18c20c;\n  --on-accent: #061008;\n  --bg: #050505;\n  --bg-alt: #0a0a0a;\n  --surface: #111111;\n  --text: #f5f5f5;\n  --text-muted: #a3a3a3;\n  --border: #262626;\n  --radius: 8px;\n  --font-sans: \"Geist Sans\", \"Geist\", ui-sans-serif, system-ui, sans-serif;\n  --font-mono: \"Geist Mono\", ui-monospace, SFMono-Regular, Menlo, monospace;\n}\n\n[data-theme=\"light\"] {\n  --bg: #f7f7f4;\n  --bg-alt: #fafaf7;\n  --surface: #ffffff;\n  --text: #171717;\n  --text-muted: #525252;\n  --border: #e5e5e5;\n}\n\nhtml, body {\n  background: var(--bg);\n  color: var(--text);\n  font-family: var(--font-sans);\n}\n```\n\n---\n\n## Token dump (machine)\n\n```json\n{\n  \"name\": \"tinity\",\n  \"accent\": \"#1fdb12\",\n  \"onAccent\": \"#061008\",\n  \"dark\": {\n    \"bg\": \"#050505\",\n    \"surface\": \"#111111\",\n    \"text\": \"#f5f5f5\",\n    \"border\": \"#262626\"\n  },\n  \"light\": {\n    \"bg\": \"#f7f7f4\",\n    \"surface\": \"#ffffff\",\n    \"text\": \"#171717\",\n    \"border\": \"#e5e5e5\"\n  },\n  \"fonts\": {\n    \"sans\": \"Geist Sans\",\n    \"mono\": \"Geist Mono\"\n  },\n  \"radius\": { \"control\": \"6px\", \"panel\": \"8px\", \"max\": \"12px\" },\n  \"space\": [4, 8, 12, 16, 24, 32, 48, 64, 96]\n}\n```\n\n---\n\n## 13. Marketing IA (`/tinity`)\n\nOne page. No subpages. Hash sections. Windows via `?w=`. Agent surface via `?surface=agent`.\n\n| Band | Role |\n|------|------|\n| Nav | 52px hairline. Lockup (24px mark + wordmark). HUMAN / AGENT. Ghost GitHub. Docs · soon. Under 768px: lockup + switch + menu dialog. |\n| Hero | `100svh` grid `auto 1fr auto`. Stage fills the middle. Caption: eyebrow `TINITY / HARNESS`, H1 \"A friend to all harnesses.\", one-line dek, ghost GitHub + Docs. `tinity me` is the only accent action. |\n| Status | `#status`. Split head: `RUNS ON v0.1.0` + `17 IDLE`. Then 17 pips. `idle` is grayscale. `live` may use the 4–8px green halo. |\n| Hub | `#hub`. Split head (title left, dek right). SVG ring, Tinity at center, spokes inbound. Dash-offset + a few traveling dots. `prefers-reduced-motion` is static. Mobile: stacked tiles. |\n| Slices | `#slices`. Six `.panel` cells. Shipped gets a 2px inset accent tick. Badges: SHIPPED fill, IN DESIGN outline, NEXT/LATER dim. |\n| Changelog | `#changelog`. Three dated `.panel` cards. Full changelog opens a window. |\n| Community | `#community`. GitHub, X, Slack coming. One Contribute ghost. |\n| FAQ | `#faq`. Five `details[name=faq]`. No JS accordion. |\n| Footer | Flow credits (not fixed). MIT + version. |\n\nMarketing sections compose as `Section.Root / Inner / Header / Copy / Title / Dek`. Cards compose as `Panel` inside `PanelGrid`. Windows compose as `Window.Frame` + `Window.Docs` | `Window.Changelog`. Surfaces are explicit: `HumanSurface` vs `AgentSurface`.\n\nDo not add an 8-item mega-nav. Do not wrap the hero in a card. Do not put a second primary next to `tinity me`. Card hover is `--border-strong` only.\n\nWindows: one native `<dialog>`, max 720px, radius 12, 1px border plus the single allowed popover shadow, 180ms opacity + `translateY(4px)`. Backdrop `rgba(5,5,5,0.6)`.\n\n---\n\n## 14. Agent surface contract\n\nSame origin. Same URL.\n\n- `?surface=agent` sets `data-surface=\"agent\"`. Marketing spine unmounts. Markdown twin renders with Copy page.\n- Twins: `/tinity/llms.txt`, `/tinity/index.md`, `/tinity/changelog.md`, `/tinity/design.md`.\n- `<link rel=\"alternate\" type=\"text/markdown\">` on the HTML shell.\n- `#tinity-state` JSON: version + harness count + status.\n- JSON-LD `SoftwareSourceCode`.\n- Stage Escape unflips only when no `dialog[open]`.\n\nPresent-tense claims are limited to shipped work: landing, cursor-gateway v0.1.0, connector library. Layer 8, eval, Slack bus, fleets, and sandboxes stay future tense.\n\nDo not conflate the internal Hermes orchestrator with the Hermes Agent landing tile.\n\n---\n\n## 15. Skill precedence\n\nInstalled project skills (`.agents/skills/`): `frontend-design`, `web-design-guidelines`, `design-taste-frontend`, `impeccable`, `dashmotion`, `svg-animations`.\n\nThis file wins on conflict.\n\n- No GSAP (or any motion library) unless a later change names it.\n- No second accent from a skill palette.\n- No em-dash rewrites of locked copy (`tinity me`, manifesto, DESIGN voice).\n- Dashmotion tokens (`#020617`, JetBrains Mono) do not replace Geist or `#050505`.\n- Taste-skill variance/motion/density dials: low variance, purposeful motion, medium density. Signature is the lattice Stage plus the hub, not a new art direction.\n",
 +} as const
 +
 +export type TwinName = keyof typeof twins
@@ -1779,19 +1646,19 @@ index 0000000..87797f8
 +export const GET: APIRoute = () => tinityTwinResponse("llms.txt")
 diff --git a/src/tinity/.tinity-source.json b/src/tinity/.tinity-source.json
 new file mode 100644
-index 0000000..2cabe84
+index 0000000..5a15965
 --- /dev/null
 +++ b/src/tinity/.tinity-source.json
-@@ -0,0 +1,80 @@
+@@ -0,0 +1,88 @@
 +{
-+  "sha": "347d35fe7f13ca047e90530f201e25fb25fb0e5f",
-+  "pulledAt": "2026-09-03T06:07:29.509Z",
++  "sha": "276d6da81c045060aa7688eea722d889e8c84ef0",
++  "pulledAt": "2026-09-03T08:48:08.566Z",
 +  "source": {
 +    "kind": "local",
 +    "path": "/workspace"
 +  },
 +  "files": {
-+    "App.tsx": "d2ec8111d24c828e94d98992b759085796b67021036ac28ac1e180ec0af6ce06",
++    "App.tsx": "4bd12e0ada8b17ed585a5a253e617dc5033399abe4b60e27ef19e071a32e8273",
 +    "components/canvasui/DecryptReveal.tsx": "3a437abb007d576d8ad495011f80416c693dd42320fbf3598b397fdb74e46999",
 +    "components/canvasui/ForceField.tsx": "7d8beae786d7adf9ebd0ba43f3ab578bc44101315e930df0d8b0e5b422d4e28d",
 +    "components/canvasui/Glitch.tsx": "e946255aa6deea5492bcd2d71f782f85f03ae68bae8163881c5635182c77f5ba",
@@ -1837,25 +1704,33 @@ index 0000000..2cabe84
 +    "experience/tiles.ts": "655b8664bee3d80f2c6e8c34cc51d7733578802db0d8dc7ead74f20e35a8ebf4",
 +    "experience/useBoard.ts": "9afd186f7b61ebe31d1288bfd4fa5012adf0d01847692c4bc7a47b0e36055774",
 +    "experience/useDecryptLabel.ts": "f6d042273ec426682a4793545b7854904a86209f214c81f429373165c5810667",
-+    "marketing/AgentSurface.tsx": "27da6e25e7be2717a26927b69082d6154573a0ad3ac68ce65a2a50d57fab4061",
-+    "marketing/Changelog.tsx": "72b7880801e01b3fa3c98da95304af60ecdded131c94a570d5b87c4386f78bef",
-+    "marketing/Community.tsx": "907e813e3235ac44b1e9c3ec875d4e6bccc03b052bd9a94adb2ba3f83e757eca",
-+    "marketing/Faq.tsx": "129e1afd777f5c15e6bd4baafaf6e58b42115107c61f3453599ca7fc98dba8f7",
++    "marketing/AgentSurface.tsx": "9bb9074c9b2b7988ca6d2161984af647df6984c27ac4c6b4c7441a91312d9996",
++    "marketing/Changelog.tsx": "b9bce9b2626ffb9baf8b002067ae0d5d667c3e9dffb5376c27154d3c53be4697",
++    "marketing/Community.tsx": "4da3cb70950b1b2f9e93994962f57f6796ced5feb6257df68a58709bbe596142",
++    "marketing/Faq.tsx": "b0faeb0e2aac8960585852a7bbf48e3d8fea37592fe9da46f21ed3930a73e851",
 +    "marketing/Footer.tsx": "08c105342ff4baf5f8e98e2b315345f9c5cf1dbe285a6130ef727a2c73c872d9",
-+    "marketing/HeroShell.tsx": "cb495d0e9fde920b66da84d11e781f2a3747e948b25eea97c0a060bfa8501513",
-+    "marketing/Hub.tsx": "d1af79788648b9bbe2cebe4da45904dc88b6307904f75f30f1c9b622e37f7801",
++    "marketing/Ghost.tsx": "d1a3e4d244396a35249a1a9b18dac688cb497c80e807782969fb810b1d75641c",
++    "marketing/HarnessMark.tsx": "edd724084e092c9f236002465ca6e49947539535e012cfe27b0d134195cf0f62",
++    "marketing/HeroShell.tsx": "c542c046c69799be9ec7b6e9425d042f18300b8f576a2c35d014a46136a8a01d",
++    "marketing/Hub.tsx": "08b3a2b7391f4a0fc0fa38a0706242c62ea6e38686616ac446ef651c1025a2ef",
++    "marketing/HumanSurface.tsx": "6a53367e0dfc68774e74d2bf05c94ec9006a8184e1dedafe962fca8cece5b809",
 +    "marketing/Lockup.tsx": "c77620fb21bdaba8784bbe88df9675e5ea8dfd670db24895d420a9fe524f2384",
-+    "marketing/Nav.tsx": "5dda745939d881288745d5d8356b63495d41de278610d76f85173c3e345ca9a1",
-+    "marketing/Slices.tsx": "f3a1586a28281352f7262da73645c910da29adda9529efd2122447ae65509b8a",
-+    "marketing/StatusBar.tsx": "484f0a698c0db2bfc22680df9503da1997d992ac656f127b2be08f562595cbdc",
-+    "marketing/Window.tsx": "3cfa7e8f6525010abdef6e022902a89ad235ac34e71ab0f5de25267f92fd8db2",
++    "marketing/Nav.tsx": "044d0a776cf5e6869bb8c4e561e9fa837e4b07336c2dde0c32f2637048062d6c",
++    "marketing/Panel.tsx": "857b2b7ffbfbfa7f3d9bd4c818f5a1d07fdb3c2f184966c2453ee91ea2f074c3",
++    "marketing/Section.tsx": "78afdca3f6eb3e301980aa562b6d10c3027fc8f654f44b1a831eb278db3cdf08",
++    "marketing/Slices.tsx": "f29554330cab223bee2fe270b840f88d1f08287494d99a456b5578368a560a9e",
++    "marketing/StatusBar.tsx": "f38b17acd1f571dfdeda572218ab6421d90f4616029d26df0ad0d3db7d22cfa5",
++    "marketing/SurfaceSwitch.tsx": "c083515e9509abdba1f92734c5deccaa89aa4e4d4f472134bad4b946f74fa40f",
++    "marketing/Window.tsx": "79c36626bfadad7bb3c87ac029b6aa6c46bb0fb20da2a9d3c40866c1f54bcd6d",
++    "marketing/cx.ts": "b5b645f2d3234c86f88209a2659603fcf478a44aef80283d083cbb81473315c5",
++    "marketing/harnessStatus.ts": "273242fd990a28ae8840b5b5076372f4524f1256904e9f12b96e5413c9cc9cff",
 +    "marketing/hubLayout.ts": "105bc8ea7ffc5211192c6ff71c257f218d540224be09790cdfb1e8358a1ee4d1",
 +    "marketing/shell.tsx": "ffb819eacd14c3b180a2cddfee2ed5eca3aa1ee4c57e9f9a524ec74bfdd8a76f",
 +    "styles/credits.css": "6efbc592e2b21d1533d6d65e9e2f13e4357b0876ece1e872713d6ab07b1794e3",
-+    "styles/marketing.css": "23c09f1b2d34131469c91ea9bab7d88d0025390cba8d3326e3e3e813ff108ef0",
-+    "styles/tokens.css": "2d10f3bfcf5bd4dea67770796fafa355480f86839551753e5341808e97f9a71d",
++    "styles/marketing.css": "67793e5996454ad07d259628cea33cbe34db3e764f236c68b4a5a11f5ad7422c",
++    "styles/tokens.css": "0853046fe33c82d0c9dbbd70c03bb6c666f9add98bb0f20bc1b7109fca7b1042",
 +    "twins/changelog.md": "50a69f1564d6ff36376a7626a2555f07fbcde79a90901861480f9ad1b426c3ff",
-+    "twins/design.md": "a0de93bdc5e2631e2186637e78b409d53cb88ccabe29a9481c5332bf19b4fb27",
++    "twins/design.md": "55fdadef372b285839b105f6339cbc9c5f914b176363c3703231724ab1981b93",
 +    "twins/favicon.svg": "88ee729c0784050f4401518ec2272ebc28b6b8e7d1a9f74014a38da6540689e9",
 +    "twins/index.md": "25b8c01e8a5388a2c5ebbc3a462c706446b6cb90a59b0f8a82074d3cd2d58811",
 +    "twins/llms.txt": "7a9a20152e11be044266c2ed6f296211c06b9c20921edc3bef6cb29cf61500cf",
@@ -1864,44 +1739,22 @@ index 0000000..2cabe84
 +  }
 +}
 diff --git a/src/tinity/App.tsx b/src/tinity/App.tsx
-index 3e2dcd8..a5e75d9 100644
+index 3e2dcd8..3dfc1d1 100644
 --- a/src/tinity/App.tsx
 +++ b/src/tinity/App.tsx
-@@ -1,11 +1,44 @@
+@@ -1,11 +1,22 @@
 -import { Credits } from "./experience/Credits";
 -import { Stage } from "./experience/Stage";
 +import { AgentSurface } from "./marketing/AgentSurface";
-+import { Changelog } from "./marketing/Changelog";
-+import { Community } from "./marketing/Community";
-+import { Faq } from "./marketing/Faq";
-+import { Footer } from "./marketing/Footer";
-+import { HeroShell } from "./marketing/HeroShell";
-+import { Hub } from "./marketing/Hub";
++import { HumanSurface } from "./marketing/HumanSurface";
 +import { ShellProviders, useSurface } from "./marketing/shell";
-+import { Slices } from "./marketing/Slices";
-+import { StatusBar } from "./marketing/StatusBar";
 +import { WindowHost } from "./marketing/Window";
-+
-+function HumanSpine() {
-+  return (
-+    <div className="human-spine">
-+      <HeroShell />
-+      <StatusBar />
-+      <Hub />
-+      <Slices />
-+      <Changelog />
-+      <Community />
-+      <Faq />
-+      <Footer />
-+    </div>
-+  );
-+}
 +
 +function Shell() {
 +  const { surface } = useSurface();
 +  return (
 +    <div className="app" data-surface={surface}>
-+      {surface === "agent" ? <AgentSurface /> : <HumanSpine />}
++      {surface === "agent" ? <AgentSurface /> : <HumanSurface />}
 +      <WindowHost />
 +    </div>
 +  );
@@ -2240,15 +2093,63 @@ index 7453756..1a58c44 100644
          style={{
 diff --git a/src/tinity/marketing/AgentSurface.tsx b/src/tinity/marketing/AgentSurface.tsx
 new file mode 100644
-index 0000000..bdf85d9
+index 0000000..c575e02
 --- /dev/null
 +++ b/src/tinity/marketing/AgentSurface.tsx
-@@ -0,0 +1,61 @@
+@@ -0,0 +1,88 @@
 +import { useEffect, useState } from "react";
++import { HARNESSES } from "../content/harnesses";
++import { REPO_HREF, VERSION } from "../content/version";
++import { GhostButton, GhostLink } from "./Ghost";
 +import { Nav } from "./Nav";
 +
++const SKELETON = `---
++title: Tinity
++version: …
++---
++
++Loading index.md…`;
++
++const TWINS = [
++  { file: "llms.txt", label: "llms.txt" },
++  { file: "index.md", label: "index.md" },
++  { file: "changelog.md", label: "changelog.md" },
++  { file: "design.md", label: "design.md" },
++] as const;
++
++function AgentToolbar({
++  copied,
++  ready,
++  onCopy,
++}: {
++  copied: boolean;
++  ready: boolean;
++  onCopy: () => void;
++}) {
++  return (
++    <div className="agent-toolbar">
++      <div className="agent-toolbar-actions">
++        <GhostButton disabled={!ready} onClick={onCopy}>
++          {copied ? "Copied" : "Copy page"}
++        </GhostButton>
++        {TWINS.map((twin) => (
++          <GhostLink key={twin.file} href={`${import.meta.env.BASE_URL}${twin.file}`}>
++            {twin.label}
++          </GhostLink>
++        ))}
++        <GhostLink href={REPO_HREF} target="_blank" rel="noopener noreferrer">
++          README
++        </GhostLink>
++      </div>
++      <p className="agent-toolbar-meta">
++        v{VERSION} · {HARNESSES.length} idle
++      </p>
++    </div>
++  );
++}
++
 +export function AgentSurface() {
-+  const [text, setText] = useState("Loading index.md…");
++  const [text, setText] = useState<string | null>(null);
 +  const [copied, setCopied] = useState(false);
 +  const href = `${import.meta.env.BASE_URL}index.md`;
 +
@@ -2268,6 +2169,7 @@ index 0000000..bdf85d9
 +  }, [href]);
 +
 +  const copy = async () => {
++    if (!text) return;
 +    await navigator.clipboard.writeText(text);
 +    setCopied(true);
 +    window.setTimeout(() => setCopied(false), 1600);
@@ -2276,144 +2178,128 @@ index 0000000..bdf85d9
 +  return (
 +    <div className="agent-surface">
 +      <Nav />
-+      <div className="agent-toolbar">
-+        <button type="button" className="btn-ghost" onClick={() => void copy()}>
-+          {copied ? "Copied" : "Copy page"}
-+        </button>
-+        <a className="btn-ghost" href={`${import.meta.env.BASE_URL}llms.txt`}>
-+          llms.txt
-+        </a>
-+        <a className="btn-ghost" href={`${import.meta.env.BASE_URL}index.md`}>
-+          index.md
-+        </a>
-+        <a className="btn-ghost" href={`${import.meta.env.BASE_URL}changelog.md`}>
-+          changelog.md
-+        </a>
-+        <a className="btn-ghost" href={`${import.meta.env.BASE_URL}design.md`}>
-+          design.md
-+        </a>
-+        <a
-+          className="btn-ghost"
-+          href="https://github.com/jseramn/tinity"
-+          target="_blank"
-+          rel="noopener noreferrer"
-+        >
-+          README
-+        </a>
-+      </div>
-+      <pre className="agent-md">{text}</pre>
++      <AgentToolbar copied={copied} ready={Boolean(text)} onCopy={() => void copy()} />
++      <pre className={`agent-md${text ? "" : " agent-md--loading"}`} aria-busy={!text}>
++        {text ?? SKELETON}
++      </pre>
 +    </div>
 +  );
 +}
 diff --git a/src/tinity/marketing/Changelog.tsx b/src/tinity/marketing/Changelog.tsx
 new file mode 100644
-index 0000000..63f5ab3
+index 0000000..de2f677
 --- /dev/null
 +++ b/src/tinity/marketing/Changelog.tsx
-@@ -0,0 +1,41 @@
+@@ -0,0 +1,40 @@
 +import { CHANGELOG, datedChangelog } from "../content/changelog";
++import { GhostButton } from "./Ghost";
++import { Panel, PanelGrid } from "./Panel";
++import { Section } from "./Section";
 +import { useWindow } from "./shell";
 +
 +export function Changelog() {
 +  const { open } = useWindow();
 +  const cards = datedChangelog(CHANGELOG).slice(0, 3);
 +  return (
-+    <section
-+      className="section changelog"
++    <Section.Root
++      className="changelog"
 +      id="changelog"
 +      aria-labelledby="changelog-title"
 +    >
-+      <div className="section-inner">
-+        <p className="eyebrow" id="changelog-title">
-+          CHANGELOG
-+        </p>
-+        <h2 className="section-title">What landed.</h2>
-+        <ul className="change-grid">
++      <Section.Inner>
++        <Section.Header>
++          <Section.Copy>
++            <Section.Eyebrow id="changelog-title">CHANGELOG</Section.Eyebrow>
++            <Section.Title>What landed.</Section.Title>
++          </Section.Copy>
++        </Section.Header>
++        <PanelGrid>
 +          {cards.map((entry) => (
-+            <li key={`${entry.version}-${entry.date}`} className="change-card">
++            <Panel key={`${entry.version}-${entry.date}`}>
 +              <p className="eyebrow">{entry.date}</p>
-+              <h3 className="change-title">v{entry.version}</h3>
++              <h3 className="panel-title">v{entry.version}</h3>
 +              <ul>
 +                {entry.highlights.slice(0, 3).map((line) => (
 +                  <li key={line}>{line}</li>
 +                ))}
 +              </ul>
-+            </li>
++            </Panel>
 +          ))}
-+        </ul>
-+        <button
-+          type="button"
-+          className="btn-ghost"
-+          onClick={() => open("changelog")}
-+        >
-+          Full changelog
-+        </button>
-+      </div>
-+    </section>
++        </PanelGrid>
++        <GhostButton onClick={() => open("changelog")}>Full changelog</GhostButton>
++      </Section.Inner>
++    </Section.Root>
 +  );
 +}
 diff --git a/src/tinity/marketing/Community.tsx b/src/tinity/marketing/Community.tsx
 new file mode 100644
-index 0000000..600cb8b
+index 0000000..3556de4
 --- /dev/null
 +++ b/src/tinity/marketing/Community.tsx
-@@ -0,0 +1,40 @@
+@@ -0,0 +1,44 @@
 +import { COMMUNITY } from "../content/community";
 +import { REPO_ISSUES_HREF } from "../content/version";
++import { GhostLink } from "./Ghost";
++import { Panel, PanelGrid } from "./Panel";
++import { Section } from "./Section";
 +
 +export function Community() {
 +  return (
-+    <section
-+      className="section community"
++    <Section.Root
++      className="community"
 +      id="community"
 +      aria-labelledby="community-title"
 +    >
-+      <div className="section-inner">
-+        <p className="eyebrow" id="community-title">
-+          COMMUNITY
-+        </p>
-+        <h2 className="section-title">We are still building this.</h2>
-+        <p className="section-dek">
-+          Channels are reserved. The public trail is GitHub.
-+        </p>
-+        <ul className="community-grid">
++      <Section.Inner>
++        <Section.Header>
++          <Section.Copy>
++            <Section.Eyebrow id="community-title">COMMUNITY</Section.Eyebrow>
++            <Section.Title>We are still building this.</Section.Title>
++          </Section.Copy>
++          <Section.Dek>
++            Channels are reserved. The public trail is GitHub.
++          </Section.Dek>
++        </Section.Header>
++        <PanelGrid>
 +          {COMMUNITY.map((item) => (
-+            <li key={item.id} data-status={item.status}>
++            <Panel key={item.id} data-status={item.status}>
 +              <a href={item.href} target="_blank" rel="noopener noreferrer">
 +                {item.label}
 +              </a>
-+              <p>{item.dek}</p>
-+            </li>
++              <p className="panel-dek">{item.dek}</p>
++            </Panel>
 +          ))}
-+        </ul>
-+        <a
-+          className="btn-ghost"
++        </PanelGrid>
++        <GhostLink
 +          href={REPO_ISSUES_HREF}
 +          target="_blank"
 +          rel="noopener noreferrer"
 +        >
 +          Contribute
-+        </a>
-+      </div>
-+    </section>
++        </GhostLink>
++      </Section.Inner>
++    </Section.Root>
 +  );
 +}
 diff --git a/src/tinity/marketing/Faq.tsx b/src/tinity/marketing/Faq.tsx
 new file mode 100644
-index 0000000..c2f6e99
+index 0000000..33a50f1
 --- /dev/null
 +++ b/src/tinity/marketing/Faq.tsx
-@@ -0,0 +1,22 @@
+@@ -0,0 +1,25 @@
 +import { FAQ } from "../content/faq";
++import { Section } from "./Section";
 +
 +export function Faq() {
 +  return (
-+    <section className="section faq" id="faq" aria-labelledby="faq-title">
-+      <div className="section-inner">
-+        <p className="eyebrow" id="faq-title">
-+          FAQ
-+        </p>
-+        <h2 className="section-title">Short answers while we apply to OSS.</h2>
++    <Section.Root className="faq" id="faq" aria-labelledby="faq-title">
++      <Section.Inner>
++        <Section.Header>
++          <Section.Copy>
++            <Section.Eyebrow id="faq-title">FAQ</Section.Eyebrow>
++            <Section.Title>Short answers while we apply to OSS.</Section.Title>
++          </Section.Copy>
++        </Section.Header>
 +        <div className="faq-list">
 +          {FAQ.map((item) => (
 +            <details key={item.id} name="faq" className="faq-item">
@@ -2422,8 +2308,8 @@ index 0000000..c2f6e99
 +            </details>
 +          ))}
 +        </div>
-+      </div>
-+    </section>
++      </Section.Inner>
++    </Section.Root>
 +  );
 +}
 diff --git a/src/tinity/marketing/Footer.tsx b/src/tinity/marketing/Footer.tsx
@@ -2443,14 +2329,81 @@ index 0000000..c0f5249
 +    </footer>
 +  );
 +}
+diff --git a/src/tinity/marketing/Ghost.tsx b/src/tinity/marketing/Ghost.tsx
+new file mode 100644
+index 0000000..5df9691
+--- /dev/null
++++ b/src/tinity/marketing/Ghost.tsx
+@@ -0,0 +1,27 @@
++import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from "react";
++import { cx } from "./cx";
++
++type GhostButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
++
++export function GhostButton({
++  className,
++  type = "button",
++  children,
++  ...props
++}: GhostButtonProps) {
++  return (
++    <button type={type} className={cx("btn-ghost", className)} {...props}>
++      {children}
++    </button>
++  );
++}
++
++type GhostLinkProps = AnchorHTMLAttributes<HTMLAnchorElement>;
++
++export function GhostLink({ className, children, ...props }: GhostLinkProps) {
++  return (
++    <a className={cx("btn-ghost", className)} {...props}>
++      {children}
++    </a>
++  );
++}
+diff --git a/src/tinity/marketing/HarnessMark.tsx b/src/tinity/marketing/HarnessMark.tsx
+new file mode 100644
+index 0000000..884fc83
+--- /dev/null
++++ b/src/tinity/marketing/HarnessMark.tsx
+@@ -0,0 +1,27 @@
++import type { Harness } from "../content/harnesses";
++import { markSrcFor } from "../experience/AgentMark";
++import { cx } from "./cx";
++
++export function HarnessMark({
++  harness,
++  size = 20,
++  lazy = false,
++  className,
++}: {
++  harness: Harness;
++  size?: number;
++  lazy?: boolean;
++  className?: string;
++}) {
++  return (
++    <img
++      className={cx("harness-mark", className)}
++      src={markSrcFor(harness.id)}
++      alt=""
++      width={size}
++      height={size}
++      loading={lazy ? "lazy" : undefined}
++      decoding="async"
++    />
++  );
++}
 diff --git a/src/tinity/marketing/HeroShell.tsx b/src/tinity/marketing/HeroShell.tsx
 new file mode 100644
-index 0000000..957fb2b
+index 0000000..4ed430d
 --- /dev/null
 +++ b/src/tinity/marketing/HeroShell.tsx
-@@ -0,0 +1,46 @@
+@@ -0,0 +1,40 @@
 +import { REPO_HREF } from "../content/version";
 +import { Stage } from "../experience/Stage";
++import { GhostButton, GhostLink } from "./Ghost";
 +import { Nav } from "./Nav";
 +import { useWindow } from "./shell";
 +
@@ -2465,17 +2418,10 @@ index 0000000..957fb2b
 +        8 will be agent-based.
 +      </p>
 +      <div className="hero-actions">
-+        <a
-+          className="btn-ghost"
-+          href={REPO_HREF}
-+          target="_blank"
-+          rel="noopener noreferrer"
-+        >
++        <GhostLink href={REPO_HREF} target="_blank" rel="noopener noreferrer">
 +          GitHub
-+        </a>
-+        <button type="button" className="btn-ghost" onClick={() => open("docs")}>
-+          Docs · soon
-+        </button>
++        </GhostLink>
++        <GhostButton onClick={() => open("docs")}>Docs · soon</GhostButton>
 +      </div>
 +      <a className="scroll-hint" href="#status">
 +        SCROLL
@@ -2497,15 +2443,18 @@ index 0000000..957fb2b
 +}
 diff --git a/src/tinity/marketing/Hub.tsx b/src/tinity/marketing/Hub.tsx
 new file mode 100644
-index 0000000..af487fe
+index 0000000..c3c963a
 --- /dev/null
 +++ b/src/tinity/marketing/Hub.tsx
-@@ -0,0 +1,106 @@
+@@ -0,0 +1,117 @@
 +import { HARNESSES } from "../content/harnesses";
 +import { markSrcFor } from "../experience/AgentMark";
 +import { usePrefersReducedMotion } from "../experience/motion";
-+import { MarkSvg } from "./Lockup";
++import { HarnessMark } from "./HarnessMark";
++import { harnessTooltip } from "./harnessStatus";
 +import { HUB_CX, HUB_CY, hubLayout, spokePath } from "./hubLayout";
++import { MarkSvg } from "./Lockup";
++import { Section } from "./Section";
 +
 +const SIZE = 800;
 +const DOT_INDEXES = [0, 4, 8, 12];
@@ -2514,15 +2463,17 @@ index 0000000..af487fe
 +  const reduced = usePrefersReducedMotion();
 +  const nodes = hubLayout(HARNESSES.map((h) => h.id));
 +  return (
-+    <section className="section hub" id="hub" aria-labelledby="hub-title">
-+      <div className="section-inner">
-+        <p className="eyebrow" id="hub-title">
-+          HUB
-+        </p>
-+        <h2 className="section-title">Tinity is the node between the harnesses.</h2>
-+        <p className="section-dek">
-+          Seventeen spokes in. Policy out, later. Today every rim node is idle.
-+        </p>
++    <Section.Root className="hub" id="hub" aria-labelledby="hub-title">
++      <Section.Inner>
++        <Section.Header>
++          <Section.Copy>
++            <Section.Eyebrow id="hub-title">HUB</Section.Eyebrow>
++            <Section.Title>Tinity is the node between the harnesses.</Section.Title>
++          </Section.Copy>
++          <Section.Dek>
++            Seventeen spokes in. Policy out, later. Today every rim node is idle.
++          </Section.Dek>
++        </Section.Header>
 +        <figure
 +          className="hub-figure"
 +          role="img"
@@ -2571,6 +2522,7 @@ index 0000000..af487fe
 +            </g>
 +            {nodes.map((node) => {
 +              const harness = HARNESSES[node.index]!;
++              const tip = harnessTooltip(harness.label, harness.status);
 +              return (
 +                <g
 +                  key={`node-${node.id}`}
@@ -2578,13 +2530,14 @@ index 0000000..af487fe
 +                  data-status={harness.status}
 +                  transform={`translate(${node.x * SIZE} ${node.y * SIZE})`}
 +                >
-+                  <circle r="18" fill="#111111" stroke="#262626" />
++                  <title>{tip}</title>
++                  <circle r="22" fill="#111111" stroke="#262626" />
 +                  <image
 +                    href={markSrcFor(harness.id)}
-+                    x="-10"
-+                    y="-10"
-+                    width="20"
-+                    height="20"
++                    x="-12"
++                    y="-12"
++                    width="24"
++                    height="24"
 +                  />
 +                </g>
 +              );
@@ -2592,8 +2545,12 @@ index 0000000..af487fe
 +          </svg>
 +          <ul className="hub-stack">
 +            {HARNESSES.map((harness) => (
-+              <li key={harness.id} data-status={harness.status}>
-+                <img src={markSrcFor(harness.id)} alt="" width={20} height={20} />
++              <li
++                key={harness.id}
++                data-status={harness.status}
++                title={harnessTooltip(harness.label, harness.status)}
++              >
++                <HarnessMark harness={harness} size={24} lazy />
 +                <span>{harness.label}</span>
 +              </li>
 +            ))}
@@ -2603,8 +2560,37 @@ index 0000000..af487fe
 +            ring. All nodes are idle.
 +          </figcaption>
 +        </figure>
-+      </div>
-+    </section>
++      </Section.Inner>
++    </Section.Root>
++  );
++}
+diff --git a/src/tinity/marketing/HumanSurface.tsx b/src/tinity/marketing/HumanSurface.tsx
+new file mode 100644
+index 0000000..cd1a46f
+--- /dev/null
++++ b/src/tinity/marketing/HumanSurface.tsx
+@@ -0,0 +1,23 @@
++import { Changelog } from "./Changelog";
++import { Community } from "./Community";
++import { Faq } from "./Faq";
++import { Footer } from "./Footer";
++import { HeroShell } from "./HeroShell";
++import { Hub } from "./Hub";
++import { Slices } from "./Slices";
++import { StatusBar } from "./StatusBar";
++
++export function HumanSurface() {
++  return (
++    <div className="human-spine">
++      <HeroShell />
++      <StatusBar />
++      <Hub />
++      <Slices />
++      <Changelog />
++      <Community />
++      <Faq />
++      <Footer />
++    </div>
 +  );
 +}
 diff --git a/src/tinity/marketing/Lockup.tsx b/src/tinity/marketing/Lockup.tsx
@@ -2716,17 +2702,27 @@ index 0000000..ad1bfba
 +}
 diff --git a/src/tinity/marketing/Nav.tsx b/src/tinity/marketing/Nav.tsx
 new file mode 100644
-index 0000000..cda6e5f
+index 0000000..dd7ad24
 --- /dev/null
 +++ b/src/tinity/marketing/Nav.tsx
-@@ -0,0 +1,110 @@
+@@ -0,0 +1,73 @@
 +import { useRef } from "react";
 +import { REPO_HREF } from "../content/version";
++import { GhostButton, GhostLink } from "./Ghost";
 +import { Lockup } from "./Lockup";
-+import { useSurface, useWindow } from "./shell";
++import { useWindow } from "./shell";
++import { SurfaceSwitch } from "./SurfaceSwitch";
++
++const DRAWER_HASHES = [
++  ["#status", "Status"],
++  ["#hub", "Hub"],
++  ["#slices", "Slices"],
++  ["#changelog", "Changelog"],
++  ["#community", "Community"],
++  ["#faq", "FAQ"],
++] as const;
 +
 +export function Nav() {
-+  const { surface, setSurface } = useSurface();
 +  const { open } = useWindow();
 +  const menuRef = useRef<HTMLDialogElement>(null);
 +
@@ -2738,43 +2734,18 @@ index 0000000..cda6e5f
 +    <header className="nav">
 +      <Lockup />
 +      <div className="nav-end">
-+        <div
-+          className="surface-switch"
-+          role="group"
-+          aria-label="Page surface"
-+        >
-+          <button
-+            type="button"
-+            className="surface-switch-btn"
-+            aria-pressed={surface === "human"}
-+            onClick={() => setSurface("human")}
-+          >
-+            HUMAN
-+          </button>
-+          <button
-+            type="button"
-+            className="surface-switch-btn"
-+            aria-pressed={surface === "agent"}
-+            onClick={() => setSurface("agent")}
-+          >
-+            AGENT
-+          </button>
-+        </div>
-+        <a
-+          className="btn-ghost nav-desktop"
++        <SurfaceSwitch />
++        <GhostLink
++          className="nav-desktop"
 +          href={REPO_HREF}
 +          target="_blank"
 +          rel="noopener noreferrer"
 +        >
 +          GitHub ↗
-+        </a>
-+        <button
-+          type="button"
-+          className="btn-ghost nav-desktop"
-+          onClick={() => open("docs")}
-+        >
++        </GhostLink>
++        <GhostButton className="nav-desktop" onClick={() => open("docs")}>
 +          Docs · soon
-+        </button>
++        </GhostButton>
 +        <button
 +          type="button"
 +          className="nav-menu"
@@ -2786,141 +2757,268 @@ index 0000000..cda6e5f
 +      </div>
 +      <dialog ref={menuRef} className="nav-drawer" onClose={closeMenu}>
 +        <form method="dialog">
-+          <button type="submit" className="btn-ghost">
-+            Close
-+          </button>
++          <GhostButton type="submit">Close</GhostButton>
 +        </form>
-+        <a
-+          className="btn-ghost"
-+          href={REPO_HREF}
-+          target="_blank"
-+          rel="noopener noreferrer"
-+        >
++        <GhostLink href={REPO_HREF} target="_blank" rel="noopener noreferrer">
 +          GitHub ↗
-+        </a>
-+        <button
-+          type="button"
-+          className="btn-ghost"
++        </GhostLink>
++        <GhostButton
 +          onClick={() => {
 +            open("docs");
 +            closeMenu();
 +          }}
 +        >
 +          Docs · soon
-+        </button>
-+        <a className="btn-ghost" href="#status" onClick={closeMenu}>
-+          Status
-+        </a>
-+        <a className="btn-ghost" href="#hub" onClick={closeMenu}>
-+          Hub
-+        </a>
-+        <a className="btn-ghost" href="#slices" onClick={closeMenu}>
-+          Slices
-+        </a>
-+        <a className="btn-ghost" href="#changelog" onClick={closeMenu}>
-+          Changelog
-+        </a>
-+        <a className="btn-ghost" href="#community" onClick={closeMenu}>
-+          Community
-+        </a>
-+        <a className="btn-ghost" href="#faq" onClick={closeMenu}>
-+          FAQ
-+        </a>
++        </GhostButton>
++        {DRAWER_HASHES.map(([href, label]) => (
++          <GhostLink key={href} href={href} onClick={closeMenu}>
++            {label}
++          </GhostLink>
++        ))}
 +      </dialog>
 +    </header>
 +  );
 +}
+diff --git a/src/tinity/marketing/Panel.tsx b/src/tinity/marketing/Panel.tsx
+new file mode 100644
+index 0000000..f09146d
+--- /dev/null
++++ b/src/tinity/marketing/Panel.tsx
+@@ -0,0 +1,27 @@
++import type { HTMLAttributes, ReactNode } from "react";
++import { cx } from "./cx";
++
++type PanelTag = "li" | "article" | "div";
++
++type PanelProps = HTMLAttributes<HTMLElement> & {
++  as?: PanelTag;
++  children: ReactNode;
++};
++
++export function Panel({ as: Tag = "li", className, children, ...props }: PanelProps) {
++  return (
++    <Tag className={cx("panel", className)} {...props}>
++      {children}
++    </Tag>
++  );
++}
++
++export function PanelGrid({
++  className,
++  children,
++}: {
++  className?: string;
++  children: ReactNode;
++}) {
++  return <ul className={cx("panel-grid", className)}>{children}</ul>;
++}
+diff --git a/src/tinity/marketing/Section.tsx b/src/tinity/marketing/Section.tsx
+new file mode 100644
+index 0000000..820551a
+--- /dev/null
++++ b/src/tinity/marketing/Section.tsx
+@@ -0,0 +1,61 @@
++import type { ComponentPropsWithoutRef, ReactNode } from "react";
++import { cx } from "./cx";
++
++type SectionRootProps = ComponentPropsWithoutRef<"section">;
++
++function Root({ className, children, ...props }: SectionRootProps) {
++  return (
++    <section className={cx("section", className)} {...props}>
++      {children}
++    </section>
++  );
++}
++
++function Inner({ children }: { children: ReactNode }) {
++  return <div className="section-inner">{children}</div>;
++}
++
++function Header({ children }: { children: ReactNode }) {
++  return <header className="section-head">{children}</header>;
++}
++
++function Copy({ children }: { children: ReactNode }) {
++  return <div className="section-copy">{children}</div>;
++}
++
++function Meta({ children }: { children: ReactNode }) {
++  return <div className="section-meta">{children}</div>;
++}
++
++function Eyebrow({
++  id,
++  children,
++}: {
++  id?: string;
++  children: ReactNode;
++}) {
++  return (
++    <p className="eyebrow" id={id}>
++      {children}
++    </p>
++  );
++}
++
++function Title({ children }: { children: ReactNode }) {
++  return <h2 className="section-title">{children}</h2>;
++}
++
++function Dek({ children }: { children: ReactNode }) {
++  return <p className="section-dek">{children}</p>;
++}
++
++export const Section = {
++  Root,
++  Inner,
++  Header,
++  Copy,
++  Meta,
++  Eyebrow,
++  Title,
++  Dek,
++};
 diff --git a/src/tinity/marketing/Slices.tsx b/src/tinity/marketing/Slices.tsx
 new file mode 100644
-index 0000000..ee007e4
+index 0000000..473afa4
 --- /dev/null
 +++ b/src/tinity/marketing/Slices.tsx
-@@ -0,0 +1,29 @@
+@@ -0,0 +1,37 @@
 +import { SLICES, SLICE_BADGE } from "../content/slices";
++import { Panel, PanelGrid } from "./Panel";
++import { Section } from "./Section";
 +
 +export function Slices() {
 +  return (
-+    <section className="section slices" id="slices" aria-labelledby="slices-title">
-+      <div className="section-inner">
-+        <p className="eyebrow" id="slices-title">
-+          SLICES
-+        </p>
-+        <h2 className="section-title">What Tinity is building.</h2>
-+        <p className="section-dek">
-+          Shipped means in the repo. Next and later are not present tense.
-+        </p>
-+        <ul className="slice-grid">
++    <Section.Root className="slices" id="slices" aria-labelledby="slices-title">
++      <Section.Inner>
++        <Section.Header>
++          <Section.Copy>
++            <Section.Eyebrow id="slices-title">SLICES</Section.Eyebrow>
++            <Section.Title>What Tinity is building.</Section.Title>
++          </Section.Copy>
++          <Section.Dek>
++            Shipped means in the repo. Next and later are not present tense.
++          </Section.Dek>
++        </Section.Header>
++        <PanelGrid>
 +          {SLICES.map((slice) => (
-+            <li key={slice.id} className="slice-card" data-status={slice.status}>
++            <Panel
++              key={slice.id}
++              className={slice.status === "shipped" ? "panel--shipped" : undefined}
++              data-status={slice.status}
++            >
 +              <p className="eyebrow">{slice.eyebrow}</p>
-+              <h3 className="slice-title">{slice.title}</h3>
-+              <p className="slice-dek">{slice.dek}</p>
++              <h3 className="panel-title">{slice.title}</h3>
++              <p className="panel-dek">{slice.dek}</p>
 +              <span className={`badge badge--${slice.status}`}>
 +                {SLICE_BADGE[slice.status]}
 +              </span>
-+            </li>
++            </Panel>
 +          ))}
-+        </ul>
-+      </div>
-+    </section>
++        </PanelGrid>
++      </Section.Inner>
++    </Section.Root>
 +  );
 +}
 diff --git a/src/tinity/marketing/StatusBar.tsx b/src/tinity/marketing/StatusBar.tsx
 new file mode 100644
-index 0000000..97cb99c
+index 0000000..0e9d778
 --- /dev/null
 +++ b/src/tinity/marketing/StatusBar.tsx
-@@ -0,0 +1,38 @@
-+import { HARNESSES } from "../content/harnesses";
+@@ -0,0 +1,46 @@
++import { HARNESSES, IDLE_COUNT } from "../content/harnesses";
 +import { VERSION, VERSION_TAG_HREF } from "../content/version";
-+import { markSrcFor } from "../experience/AgentMark";
++import { HarnessMark } from "./HarnessMark";
++import { harnessTooltip } from "./harnessStatus";
++import { Section } from "./Section";
 +
 +export function StatusBar() {
 +  return (
-+    <section className="section status" id="status" aria-labelledby="status-title">
-+      <div className="section-inner">
-+        <p className="eyebrow" id="status-title">
-+          STATUS
-+        </p>
-+        <a className="status-version" href={VERSION_TAG_HREF}>
-+          RUNS ON v{VERSION}
-+        </a>
++    <Section.Root className="status" id="status" aria-labelledby="status-title">
++      <Section.Inner>
++        <Section.Header>
++          <Section.Copy>
++            <Section.Eyebrow id="status-title">STATUS</Section.Eyebrow>
++            <a className="status-version" href={VERSION_TAG_HREF}>
++              RUNS ON v{VERSION}
++            </a>
++          </Section.Copy>
++          <Section.Meta>
++            <p className="status-count">
++              <span className="status-count-led" aria-hidden="true" />
++              {IDLE_COUNT} IDLE
++            </p>
++          </Section.Meta>
++        </Section.Header>
 +        <ul className="status-pips">
-+          {HARNESSES.map((harness) => (
-+            <li
-+              key={harness.id}
-+              className="status-pip"
-+              data-status={harness.status}
-+              data-harness={harness.id}
-+            >
-+              <img
-+                className="status-pip-mark"
-+                src={markSrcFor(harness.id)}
-+                alt=""
-+                width={20}
-+                height={20}
-+              />
-+              <span className="status-pip-label">{harness.label}</span>
-+              <span className="sr-only">{harness.status}</span>
-+            </li>
-+          ))}
++          {HARNESSES.map((harness) => {
++            const tip = harnessTooltip(harness.label, harness.status);
++            return (
++              <li
++                key={harness.id}
++                className="status-pip"
++                data-status={harness.status}
++                data-harness={harness.id}
++                title={tip}
++                aria-label={tip}
++              >
++                <HarnessMark harness={harness} />
++                <span className="status-pip-label">{harness.label}</span>
++              </li>
++            );
++          })}
 +        </ul>
-+      </div>
-+    </section>
++      </Section.Inner>
++    </Section.Root>
++  );
++}
+diff --git a/src/tinity/marketing/SurfaceSwitch.tsx b/src/tinity/marketing/SurfaceSwitch.tsx
+new file mode 100644
+index 0000000..203ad3a
+--- /dev/null
++++ b/src/tinity/marketing/SurfaceSwitch.tsx
+@@ -0,0 +1,26 @@
++import { useSurface } from "./shell";
++
++export function SurfaceSwitch() {
++  const { surface, setSurface } = useSurface();
++  return (
++    <div className="surface-switch" role="group" aria-label="Page surface">
++      <button
++        type="button"
++        className="surface-switch-btn"
++        aria-pressed={surface === "human"}
++        onClick={() => setSurface("human")}
++      >
++        HUMAN
++      </button>
++      <button
++        type="button"
++        className="surface-switch-btn"
++        aria-pressed={surface === "agent"}
++        title="Markdown twin for agents and MCP"
++        onClick={() => setSurface("agent")}
++      >
++        AGENT
++      </button>
++    </div>
 +  );
 +}
 diff --git a/src/tinity/marketing/Window.tsx b/src/tinity/marketing/Window.tsx
 new file mode 100644
-index 0000000..06718c3
+index 0000000..33bcc5e
 --- /dev/null
 +++ b/src/tinity/marketing/Window.tsx
-@@ -0,0 +1,67 @@
-+import { useEffect, useRef } from "react";
+@@ -0,0 +1,94 @@
++import { useEffect, useRef, type ReactNode } from "react";
 +import { CHANGELOG } from "../content/changelog";
 +import { REPO_HREF } from "../content/version";
-+import { useWindow } from "./shell";
++import { GhostButton } from "./Ghost";
++import { useWindow, type WindowId } from "./shell";
 +
-+export function WindowHost() {
++function Frame({ children }: { children: ReactNode }) {
 +  const { id, close } = useWindow();
 +  const ref = useRef<HTMLDialogElement>(null);
 +
@@ -2945,42 +3043,98 @@ index 0000000..06718c3
 +        <h2 id="win-title" className="win-title">
 +          {id === "changelog" ? "Changelog" : "Docs"}
 +        </h2>
-+        <button type="button" className="btn-ghost" onClick={close}>
-+          Close
-+        </button>
++        <GhostButton onClick={close}>Close</GhostButton>
 +      </header>
-+      {id === "changelog" ? (
-+        <div className="win-body">
-+          {CHANGELOG.map((entry) => (
-+            <article key={`${entry.version}-${entry.date ?? "unreleased"}`}>
-+              <p className="eyebrow">
-+                {entry.date ?? "Unreleased"} · {entry.version}
-+              </p>
-+              <ul>
-+                {entry.highlights.map((line) => (
-+                  <li key={line}>{line}</li>
-+                ))}
-+              </ul>
-+            </article>
-+          ))}
-+        </div>
-+      ) : (
-+        <div className="win-body">
-+          <p>Docs are coming soon.</p>
-+          <p>
-+            Until then, read{" "}
-+            <a href={`${import.meta.env.BASE_URL}index.md`}>index.md</a>,{" "}
-+            <a href={`${import.meta.env.BASE_URL}design.md`}>design.md</a>, and
-+            the{" "}
-+            <a href={REPO_HREF} target="_blank" rel="noopener noreferrer">
-+              README
-+            </a>
-+            .
-+          </p>
-+        </div>
-+      )}
++      {children}
 +    </dialog>
 +  );
++}
++
++function Docs() {
++  return (
++    <div className="win-body">
++      <p>Docs are coming soon.</p>
++      <p>
++        Until then, read{" "}
++        <a href={`${import.meta.env.BASE_URL}index.md`}>index.md</a>,{" "}
++        <a href={`${import.meta.env.BASE_URL}design.md`}>design.md</a>, and the{" "}
++        <a href={REPO_HREF} target="_blank" rel="noopener noreferrer">
++          README
++        </a>
++        .
++      </p>
++    </div>
++  );
++}
++
++function Changelog() {
++  return (
++    <div className="win-body">
++      {CHANGELOG.map((entry) => (
++        <article key={`${entry.version}-${entry.date ?? "unreleased"}`}>
++          <p className="eyebrow">
++            {entry.date ?? "Unreleased"} · {entry.version}
++          </p>
++          <ul>
++            {entry.highlights.map((line) => (
++              <li key={line}>{line}</li>
++            ))}
++          </ul>
++        </article>
++      ))}
++    </div>
++  );
++}
++
++const BODIES: Record<WindowId, () => ReactNode> = {
++  docs: () => <Docs />,
++  changelog: () => <Changelog />,
++};
++
++export const Window = {
++  Frame,
++  Docs,
++  Changelog,
++};
++
++export function WindowHost() {
++  const { id } = useWindow();
++  const Body = id ? BODIES[id] : Docs;
++  return (
++    <Window.Frame>
++      <Body />
++    </Window.Frame>
++  );
++}
+diff --git a/src/tinity/marketing/cx.ts b/src/tinity/marketing/cx.ts
+new file mode 100644
+index 0000000..aa03038
+--- /dev/null
++++ b/src/tinity/marketing/cx.ts
+@@ -0,0 +1,3 @@
++export function cx(...parts: Array<string | undefined | false>): string {
++  return parts.filter(Boolean).join(" ");
++}
+diff --git a/src/tinity/marketing/harnessStatus.ts b/src/tinity/marketing/harnessStatus.ts
+new file mode 100644
+index 0000000..a8be5a4
+--- /dev/null
++++ b/src/tinity/marketing/harnessStatus.ts
+@@ -0,0 +1,15 @@
++import type { HarnessStatus } from "../content/harnesses";
++
++const STATUS_LABEL: Record<HarnessStatus, string> = {
++  idle: "idle",
++  configured: "configured",
++  live: "live",
++};
++
++export function harnessStatusLabel(status: HarnessStatus): string {
++  return STATUS_LABEL[status];
++}
++
++export function harnessTooltip(label: string, status: HarnessStatus): string {
++  return `${label} — ${harnessStatusLabel(status)}`;
 +}
 diff --git a/src/tinity/marketing/hubLayout.ts b/src/tinity/marketing/hubLayout.ts
 new file mode 100644
@@ -3217,10 +3371,10 @@ index 8760ea8..e562521 100644
      background: rgba(5, 5, 5, 0.6);
 diff --git a/src/tinity/styles/marketing.css b/src/tinity/styles/marketing.css
 new file mode 100644
-index 0000000..115dd1e
+index 0000000..aebe9f8
 --- /dev/null
 +++ b/src/tinity/styles/marketing.css
-@@ -0,0 +1,545 @@
+@@ -0,0 +1,722 @@
 +.app {
 +  min-height: 100%;
 +  background: var(--bg);
@@ -3306,6 +3460,7 @@ index 0000000..115dd1e
 +  font-size: 12px;
 +  letter-spacing: 0.08em;
 +  cursor: pointer;
++  transition: color 120ms var(--ease);
 +}
 +
 +.surface-switch-btn[aria-pressed="true"] {
@@ -3327,10 +3482,33 @@ index 0000000..115dd1e
 +  font-weight: 500;
 +  text-decoration: none;
 +  cursor: pointer;
++  transition:
++    border-color 120ms var(--ease),
++    background-color 120ms var(--ease);
 +}
 +
 +.btn-ghost:hover {
 +  border-color: var(--text);
++}
++
++.section .btn-ghost,
++.win .btn-ghost,
++.agent-toolbar .btn-ghost,
++.nav-drawer .btn-ghost {
++  border-color: var(--border-strong);
++}
++
++.section .btn-ghost:hover,
++.win .btn-ghost:hover,
++.agent-toolbar .btn-ghost:hover,
++.nav-drawer .btn-ghost:hover {
++  border-color: var(--text);
++  background: var(--surface-2);
++}
++
++.btn-ghost:disabled {
++  opacity: 0.45;
++  cursor: not-allowed;
 +}
 +
 +.btn-ghost:focus-visible,
@@ -3396,9 +3574,9 @@ index 0000000..115dd1e
 +.hero-title {
 +  margin: 0;
 +  font-size: 48px;
-+  font-weight: 400;
-+  letter-spacing: -0.03em;
-+  line-height: 1.05;
++  font-weight: 500;
++  letter-spacing: -0.02em;
++  line-height: 1.1;
 +}
 +
 +.hero-dek,
@@ -3426,6 +3604,8 @@ index 0000000..115dd1e
 +.section {
 +  padding: 96px 24px;
 +  border-top: 1px solid var(--hairline);
++  content-visibility: auto;
++  contain-intrinsic-size: auto 520px;
 +}
 +
 +.section-inner {
@@ -3433,21 +3613,70 @@ index 0000000..115dd1e
 +  margin: 0 auto;
 +}
 +
++.section-head {
++  display: grid;
++  grid-template-columns: minmax(0, 1fr);
++  gap: 12px 64px;
++  align-items: end;
++  margin-bottom: 32px;
++}
++
++.section-head:has(.section-dek),
++.section-head:has(.section-meta) {
++  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
++}
++
++.section-copy {
++  display: grid;
++  gap: 8px;
++  justify-items: start;
++}
++
++.section-meta {
++  justify-self: end;
++  text-align: right;
++}
++
 +.section-title {
-+  margin: 8px 0 12px;
++  margin: 0;
 +  font-size: 32px;
-+  font-weight: 400;
-+  letter-spacing: -0.03em;
++  font-weight: 500;
++  letter-spacing: -0.02em;
++  line-height: 1.2;
++}
++
++.section-head .section-dek {
++  margin: 0;
++  max-width: none;
 +}
 +
 +.status-version {
 +  display: inline-block;
-+  margin: 12px 0 24px;
 +  font-family: var(--font-mono);
 +  font-size: 14px;
 +  letter-spacing: 0.12em;
 +  color: var(--text);
 +  text-decoration: none;
++}
++
++.status-count {
++  display: inline-flex;
++  align-items: center;
++  gap: 8px;
++  margin: 0;
++  font-family: var(--font-mono);
++  font-size: 12px;
++  letter-spacing: 0.12em;
++  text-transform: uppercase;
++  color: var(--text-dim);
++}
++
++.status-count-led {
++  width: 6px;
++  height: 6px;
++  border-radius: 50%;
++  background: transparent;
++  box-shadow: inset 0 0 0 1px var(--text-dim);
 +}
 +
 +.status-pips {
@@ -3464,14 +3693,30 @@ index 0000000..115dd1e
 +  align-items: center;
 +  gap: 8px;
 +  color: var(--text-dim);
++  cursor: default;
++  transition: color 120ms var(--ease);
 +}
 +
-+.status-pip[data-status="idle"] .status-pip-mark {
++.status-pip:hover,
++.status-pip:focus-within {
++  color: var(--text);
++}
++
++.status-pip[data-status="idle"] .harness-mark {
 +  filter: grayscale(1);
 +  opacity: 0.55;
++  transition:
++    filter 120ms var(--ease),
++    opacity 120ms var(--ease);
 +}
 +
-+.status-pip[data-status="live"] .status-pip-mark {
++.status-pip:hover .harness-mark,
++.status-pip:focus-within .harness-mark {
++  opacity: 0.8;
++  filter: grayscale(0.35);
++}
++
++.status-pip[data-status="live"] .harness-mark {
 +  filter: none;
 +  opacity: 1;
 +  box-shadow: 0 0 8px var(--accent-ring);
@@ -3485,7 +3730,7 @@ index 0000000..115dd1e
 +}
 +
 +.hub-figure {
-+  margin: 32px 0 0;
++  margin: 0;
 +}
 +
 +.hub-ring {
@@ -3511,6 +3756,17 @@ index 0000000..115dd1e
 +  }
 +}
 +
++.hub-node circle {
++  transition:
++    stroke 120ms var(--ease),
++    filter 120ms var(--ease);
++}
++
++.hub-node:hover circle,
++.hub-node:focus-within circle {
++  stroke: var(--border-strong);
++}
++
 +.hub-node[data-status="live"] circle {
 +  stroke: var(--accent);
 +  filter: drop-shadow(0 0 6px var(--accent-ring));
@@ -3534,44 +3790,56 @@ index 0000000..115dd1e
 +  font-size: 12px;
 +}
 +
-+.hub-stack img {
++.hub-stack .harness-mark {
 +  filter: grayscale(1);
 +  opacity: 0.55;
 +}
 +
-+.slice-grid,
-+.change-grid,
-+.community-grid {
++.panel-grid {
 +  display: grid;
 +  grid-template-columns: repeat(2, minmax(0, 1fr));
 +  gap: 16px;
 +  padding: 0;
-+  margin: 32px 0;
++  margin: 0 0 32px;
 +  list-style: none;
 +}
 +
-+.slice-card,
-+.change-card,
-+.community-grid li {
++.panel {
 +  padding: 20px;
 +  border: 1px solid var(--border);
 +  border-radius: 8px;
 +  background: var(--surface);
++  transition: border-color 120ms var(--ease);
 +}
 +
-+.slice-title,
-+.change-title {
++.panel:hover {
++  border-color: var(--border-strong);
++}
++
++.panel--shipped {
++  box-shadow: inset 2px 0 0 var(--accent);
++}
++
++.panel-title {
 +  margin: 8px 0;
 +  font-size: 20px;
 +  font-weight: 500;
 +}
 +
-+.slice-dek,
-+.community-grid p,
-+.change-card ul,
++.panel-dek,
++.panel ul,
 +.faq-item p,
 +.win-body {
 +  color: var(--text-muted);
++}
++
++.community .panel a {
++  color: var(--text);
++  text-decoration: none;
++}
++
++.community .panel[data-status="coming"] a {
++  color: var(--text-dim);
 +}
 +
 +.badge {
@@ -3600,17 +3868,8 @@ index 0000000..115dd1e
 +  border: 1px solid var(--border);
 +}
 +
-+.community-grid a {
-+  color: var(--text);
-+  text-decoration: none;
-+}
-+
-+.community-grid li[data-status="coming"] a {
-+  color: var(--text-dim);
-+}
-+
 +.faq-list {
-+  margin-top: 32px;
++  margin-top: 0;
 +}
 +
 +.faq-item {
@@ -3621,10 +3880,28 @@ index 0000000..115dd1e
 +  cursor: pointer;
 +  padding: 16px 0;
 +  font-size: 18px;
++  font-weight: 500;
++  list-style: none;
++}
++
++.faq-item summary::-webkit-details-marker {
++  display: none;
++}
++
++.faq-item summary::after {
++  content: "+";
++  float: right;
++  font-family: var(--font-mono);
++  color: var(--text-dim);
++}
++
++.faq-item[open] summary::after {
++  content: "–";
 +}
 +
 +.faq-item p {
 +  margin: 0 0 16px;
++  max-width: 65ch;
 +}
 +
 +.site-footer {
@@ -3699,19 +3976,53 @@ index 0000000..115dd1e
 +.agent-toolbar {
 +  display: flex;
 +  flex-wrap: wrap;
-+  gap: 8px;
-+  padding: 16px 24px;
++  align-items: center;
++  justify-content: space-between;
++  gap: 12px 24px;
++  padding: 12px 24px;
 +  border-bottom: 1px solid var(--hairline);
++  background: var(--bg-alt);
++}
++
++.agent-toolbar-actions {
++  display: flex;
++  flex-wrap: wrap;
++  gap: 8px;
++}
++
++.agent-toolbar-meta {
++  margin: 0;
++  font-family: var(--font-mono);
++  font-size: 12px;
++  letter-spacing: 0.08em;
++  color: var(--text-dim);
 +}
 +
 +.agent-md {
 +  margin: 0;
 +  padding: 24px;
++  max-width: 1120px;
 +  white-space: pre-wrap;
 +  font-family: var(--font-mono);
 +  font-size: 13px;
 +  line-height: 1.55;
 +  color: var(--text);
++}
++
++.agent-md--loading {
++  color: var(--text-dim);
++  animation: agent-pulse 1.2s ease-in-out infinite;
++}
++
++@keyframes agent-pulse {
++  0%,
++  100% {
++    opacity: 0.55;
++  }
++
++  50% {
++    opacity: 1;
++  }
 +}
 +
 +@media (max-width: 768px) {
@@ -3728,16 +4039,28 @@ index 0000000..115dd1e
 +  }
 +
 +  .hero-title {
-+    font-size: 32px;
++    font-size: 36px;
 +  }
 +
 +  .section {
 +    padding: 64px 16px;
 +  }
 +
-+  .slice-grid,
-+  .change-grid,
-+  .community-grid {
++  .section-head:has(.section-dek),
++  .section-head:has(.section-meta) {
++    grid-template-columns: 1fr;
++  }
++
++  .section-meta {
++    justify-self: start;
++    text-align: left;
++  }
++
++  .section-title {
++    font-size: 24px;
++  }
++
++  .panel-grid {
 +    grid-template-columns: 1fr;
 +  }
 +
@@ -3756,21 +4079,29 @@ index 0000000..115dd1e
 +    stroke-dasharray: none;
 +  }
 +
++  .agent-md--loading {
++    animation: none;
++    opacity: 0.7;
++  }
++
 +  .win[open] {
 +    animation: none;
 +  }
 +
 +  .lockup-i::after,
 +  .surface-switch-btn,
-+  .btn-ghost {
++  .btn-ghost,
++  .panel,
++  .status-pip,
++  .hub-node circle {
 +    transition: none;
 +  }
 +}
 diff --git a/src/tinity/styles/tokens.css b/src/tinity/styles/tokens.css
-index 5e8ce32..672e996 100644
+index 5e8ce32..a8de005 100644
 --- a/src/tinity/styles/tokens.css
 +++ b/src/tinity/styles/tokens.css
-@@ -21,20 +21,16 @@
+@@ -21,20 +21,28 @@
    --danger: #ee0000;
    --radius: 8px;
    --radius-control: 6px;
@@ -3778,6 +4109,18 @@ index 5e8ce32..672e996 100644
 +  --font-sans: "Geist Sans", "Geist", ui-sans-serif, system-ui, sans-serif;
    --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
    --ease: cubic-bezier(0.16, 1, 0.3, 1);
++  --duration-ui: 120ms;
++  --duration-panel: 180ms;
++}
++
++::selection {
++  background: var(--accent-wash-dark);
++  color: var(--text);
++}
++
++html {
++  scrollbar-width: thin;
++  scrollbar-color: var(--border-strong) transparent;
  }
  
  html,
@@ -3793,7 +4136,7 @@ index 5e8ce32..672e996 100644
    box-sizing: border-box;
    background: var(--bg);
    color: var(--text);
-@@ -55,7 +51,6 @@ button {
+@@ -55,7 +63,6 @@ button {
    position: relative;
    width: 100%;
    height: 100%;
@@ -3843,10 +4186,10 @@ index 0000000..59a96f3
 +- Landing reference flip on the occupancy-glass cubes
 diff --git a/src/tinity/twins/design.md b/src/tinity/twins/design.md
 new file mode 100644
-index 0000000..9ff173c
+index 0000000..e26610d
 --- /dev/null
 +++ b/src/tinity/twins/design.md
-@@ -0,0 +1,450 @@
+@@ -0,0 +1,452 @@
 +# Tinity — DESIGN.md
 +
 +Agent-readable design system.
@@ -4255,15 +4598,17 @@ index 0000000..9ff173c
 +|------|------|
 +| Nav | 52px hairline. Lockup (24px mark + wordmark). HUMAN / AGENT. Ghost GitHub. Docs · soon. Under 768px: lockup + switch + menu dialog. |
 +| Hero | `100svh` grid `auto 1fr auto`. Stage fills the middle. Caption: eyebrow `TINITY / HARNESS`, H1 "A friend to all harnesses.", one-line dek, ghost GitHub + Docs. `tinity me` is the only accent action. |
-+| Status | `#status`. `RUNS ON v0.1.0` + 17 pips. `idle` is grayscale. `live` may use the 4–8px green halo. |
-+| Hub | `#hub`. SVG ring, Tinity at center, spokes inbound. Dash-offset + a few traveling dots. `prefers-reduced-motion` is static. Mobile: stacked tiles. |
-+| Slices | `#slices`. Six cells. Badges: SHIPPED fill, IN DESIGN outline, NEXT/LATER dim. |
-+| Changelog | `#changelog`. Three dated cards. Full changelog opens a window. |
++| Status | `#status`. Split head: `RUNS ON v0.1.0` + `17 IDLE`. Then 17 pips. `idle` is grayscale. `live` may use the 4–8px green halo. |
++| Hub | `#hub`. Split head (title left, dek right). SVG ring, Tinity at center, spokes inbound. Dash-offset + a few traveling dots. `prefers-reduced-motion` is static. Mobile: stacked tiles. |
++| Slices | `#slices`. Six `.panel` cells. Shipped gets a 2px inset accent tick. Badges: SHIPPED fill, IN DESIGN outline, NEXT/LATER dim. |
++| Changelog | `#changelog`. Three dated `.panel` cards. Full changelog opens a window. |
 +| Community | `#community`. GitHub, X, Slack coming. One Contribute ghost. |
 +| FAQ | `#faq`. Five `details[name=faq]`. No JS accordion. |
 +| Footer | Flow credits (not fixed). MIT + version. |
 +
-+Do not add an 8-item mega-nav. Do not wrap the hero in a card. Do not put a second primary next to `tinity me`.
++Marketing sections compose as `Section.Root / Inner / Header / Copy / Title / Dek`. Cards compose as `Panel` inside `PanelGrid`. Windows compose as `Window.Frame` + `Window.Docs` | `Window.Changelog`. Surfaces are explicit: `HumanSurface` vs `AgentSurface`.
++
++Do not add an 8-item mega-nav. Do not wrap the hero in a card. Do not put a second primary next to `tinity me`. Card hover is `--border-strong` only.
 +
 +Windows: one native `<dialog>`, max 720px, radius 12, 1px border plus the single allowed popover shadow, 180ms opacity + `translateY(4px)`. Backdrop `rgba(5,5,5,0.6)`.
 +
@@ -4844,6 +5189,3 @@ index 2203e04..6e4fb9f 100644
      {
        "source": "/(policy|terms|data-deletion)",
        "headers": [
--- 
-2.43.0
-
