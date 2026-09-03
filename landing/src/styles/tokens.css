@@ -21,7 +21,7 @@
   --danger: #ee0000;
   --radius: 8px;
   --radius-control: 6px;
-  --font-sans: "Geist Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Geist Sans", "Geist", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -30,7 +30,10 @@ html,
 body,
 #root {
   margin: 0;
-  min-height: 100%;
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  box-sizing: border-box;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
@@ -48,10 +51,24 @@ button {
 
 .stage {
   position: relative;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
   overflow: hidden;
+  box-sizing: border-box;
   background: var(--bg);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .stage-slot {
@@ -71,6 +88,19 @@ button {
 .cube {
   position: absolute;
   --cube-thickness: calc(0.11 * var(--cell-css));
+  transition: left 480ms var(--ease), top 480ms var(--ease);
+}
+
+.cube.is-dragging {
+  transition: none;
+  z-index: 4;
+  cursor: grabbing;
+  transform: translate(var(--drag-x, 0px), var(--drag-y, 0px));
+}
+
+.cube.is-dragging .cube-lift,
+.cube--number.is-flipped.is-dragging .cube-lift {
+  transform: translateZ(calc(0.5 * var(--cell-css)));
 }
 
 .cube-tumble {
@@ -78,6 +108,13 @@ button {
   inset: 0;
   transform-origin: center center;
   transform-style: preserve-3d;
+}
+
+.cube-lift {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 220ms var(--ease);
 }
 
 .cube.cube--occupancy {
@@ -92,6 +129,13 @@ button {
   perspective: 560px;
   perspective-origin: 50% 50%;
   transform-style: preserve-3d;
+  pointer-events: auto;
+}
+
+@media (pointer: fine) {
+  .cube--number.is-flipped {
+    cursor: grab;
+  }
 }
 
 .cube-inner {
@@ -117,6 +161,10 @@ button {
 
   .cube--number.is-flipped .cube-spine {
     animation: cube-spine-pipe 720ms linear;
+  }
+
+  .cube--cta.is-armed {
+    animation: cta-pulse 2.4s ease-in-out infinite;
   }
 }
 
@@ -206,13 +254,85 @@ button {
     translateZ(var(--cube-thickness));
   background: transparent;
   color: var(--text);
-  font-size: calc(0.22 * var(--cell-css));
-  font-weight: 500;
+  flex-direction: column;
+}
+
+.cube-mark-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+  pointer-events: auto;
+}
+
+.cube--number:not(.is-flipped) .cube-mark-link {
+  pointer-events: none;
+}
+
+.cube-mark {
+  width: calc(0.72 * var(--cell-css));
+  height: calc(0.72 * var(--cell-css));
+  display: block;
+  flex-shrink: 0;
+  object-fit: contain;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.cube-mark[data-mark="pi"] {
+  image-rendering: pixelated;
+}
+
+.cube-mark[data-mark="aider"],
+.cube-mark[data-mark="hermes"],
+.cube-mark[data-mark="grok-build"],
+.cube-mark[data-mark="openhands"] {
+  width: calc(0.88 * var(--cell-css));
+  height: calc(0.88 * var(--cell-css));
 }
 
 .cube--number.is-flipped .cube-face--back {
   background: rgba(31, 219, 18, 0.16);
   box-shadow: 0 0 0 1px var(--accent-ring), 0 0 8px var(--accent-ring);
+}
+
+.cube--number.is-flipped:hover {
+  z-index: 3;
+}
+
+.cube--number.is-flipped:hover .cube-lift,
+.cube--number.is-flipped:focus-within .cube-lift {
+  transform: translateZ(calc(0.35 * var(--cell-css)));
+}
+
+.cube--number.is-flipped:hover .cube-face--back {
+  box-shadow: 0 0 0 1px var(--accent), 0 0 18px var(--accent-ring),
+    0 12px 32px rgba(0, 0, 0, 0.55);
+}
+
+.cube-label {
+  position: absolute;
+  bottom: calc(0.08 * var(--cell-css));
+  left: 0;
+  right: 0;
+  z-index: 1;
+  font: 500 clamp(8px, calc(0.11 * var(--cell-css)), 12px) / 1 var(--font-mono);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms var(--ease);
+}
+
+.cube--number.is-flipped:hover .cube-label,
+.cube--number.is-flipped:focus-within .cube-label {
+  opacity: 1;
 }
 
 .cube--number:not(.is-flipped) .cube-face--back {
@@ -227,18 +347,70 @@ button {
   box-sizing: border-box;
   padding: calc(0.03 * var(--cell-css));
   border: none;
-  background: transparent;
-  color: var(--text);
-  font-family: var(--font-sans);
-  font-size: 11px;
-  font-weight: 400;
-  line-height: 1.2;
+  background: rgba(31, 219, 18, 0.1);
+  box-shadow: 0 0 0 1px var(--accent-ring),
+    inset 0 0 0 1px rgba(31, 219, 18, 0.12);
+  color: var(--accent);
+  font: 500 clamp(9px, calc(0.115 * var(--cell-css)), 12px) / 1 var(--font-mono);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
   white-space: normal;
   overflow-wrap: anywhere;
   cursor: pointer;
+  perspective: 560px;
+  perspective-origin: 50% 50%;
+  transform-style: preserve-3d;
+}
+
+.cube--cta .cube-lift {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cube--cta:hover .cube-lift,
+.cube--cta:focus-within .cube-lift {
+  transform: translateZ(calc(0.35 * var(--cell-css)));
 }
 
 .cube--cta:focus-visible {
   outline: 2px solid var(--accent-ring);
   outline-offset: 2px;
+}
+
+@keyframes cta-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px var(--accent-ring);
+  }
+
+  50% {
+    box-shadow: 0 0 0 1px var(--accent), 0 0 14px var(--accent-ring);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cube {
+    transition: none;
+  }
+
+  .cube-lift {
+    transition: none;
+    transform: none;
+  }
+
+  .cube--number.is-flipped:hover .cube-lift,
+  .cube--number.is-flipped:focus-within .cube-lift,
+  .cube--cta:hover .cube-lift,
+  .cube--cta:focus-within .cube-lift {
+    transform: none;
+  }
+
+  .cube--cta.is-armed {
+    animation: none;
+  }
+
+  .cube-label {
+    transition: none;
+  }
 }

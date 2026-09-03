@@ -114,11 +114,21 @@ describe("agent catalog", () => {
 
   it("sizes cube marks inside the face so silhouettes cannot reach the cell edge", () => {
     expect(tokensCss).toMatch(
-      /\.cube-mark\s*\{[^}]*width:\s*calc\(0\.50 \* var\(--cell-css\)\)/,
+      /\.cube-mark\s*\{[^}]*width:\s*calc\(0\.72 \* var\(--cell-css\)\)/,
     );
     expect(tokensCss).toMatch(
-      /\.cube-mark\s*\{[^}]*height:\s*calc\(0\.50 \* var\(--cell-css\)\)/,
+      /\.cube-mark\s*\{[^}]*height:\s*calc\(0\.72 \* var\(--cell-css\)\)/,
     );
     expect(tokensCss).toMatch(/\.cube-mark\s*\{[^}]*object-fit:\s*contain/);
+  });
+
+  it("optically enlarges wide wordmarks and thin silhouettes", () => {
+    for (const id of ["aider", "hermes", "grok-build", "openhands"]) {
+      expect(tokensCss).toMatch(
+        new RegExp(
+          `\\.cube-mark\\[data-mark="${id}"\\][^{]*\\{[^}]*width:\\s*calc\\(0\\.88 \\* var\\(--cell-css\\)\\)`,
+        ),
+      );
+    }
   });
 });
