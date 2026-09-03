@@ -134,14 +134,14 @@ Roles:
 
 | Role            | Size | Weight | Line | Face        |
 |-----------------|------|--------|------|-------------|
-| display         | 64–80| 400–500| 1.00 | Geist Sans  |
-| h1              | 40–48| 500    | 1.10 | Geist Sans  |
-| h2              | 24–32| 500    | 1.20 | Geist Sans  |
-| body            | 16   | 400    | 1.55 | Geist Sans  |
-| ui              | 14   | 400–500| 1.40 | Geist Sans  |
+| display         | 56–80| 400–500| 1.05 | Geist Sans  |
+| h1              | 48–56| 500    | 1.10 | Geist Sans  |
+| h2              | 40–48| 500    | 1.12 | Geist Sans  |
+| body            | 16–18| 400    | 1.45–1.55 | Geist Sans  |
+| ui              | 14–15| 400–500| 1.40 | Geist Sans  |
 | caption         | 12–13| 400    | 1.40 | Geist Sans  |
-| eyebrow         | 11–12| 500    | 1.00 | Geist Mono  |
-| code / metric   | 13–14| 400    | 1.45 | Geist Mono  |
+| eyebrow         | 12   | 500    | 1.00 | Geist Mono  |
+| code / metric   | 13–18| 400    | 1.45 | Geist Mono  |
 
 Body line-height 1.55 marketing, 1.4 app.
 
@@ -222,7 +222,7 @@ Never put `#1fdb12` outline + `#1fdb12` fill on the same row as two competing pr
 
 - Base unit: `4px`
 - Scale: `4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 96 / 128`
-- Marketing max width `1120–1200px`
+- Marketing max width `1280px`
 - App shell `1440px`
 - Gutter `24px` desktop, `16px` mobile
 - Section rhythm marketing: `96px`
@@ -404,10 +404,10 @@ One page. No subpages. Hash sections. Windows via `?w=`. Agent surface via `?sur
 
 | Band | Role |
 |------|------|
-| Nav | 52px hairline. Lockup (24px mark + wordmark). HUMAN / AGENT. Ghost GitHub. Docs · soon. Under 768px: lockup + switch + menu dialog. |
+| Nav | 56px hairline. Lockup (24px mark + wordmark). HUMAN / AGENT. Ghost GitHub. Docs · soon. Under 768px: lockup + switch + menu dialog. |
 | Hero | `100svh` grid `auto 1fr auto`. Stage fills the middle. Caption: eyebrow `TINITY / HARNESS`, H1 "A friend to all harnesses.", one-line dek, ghost GitHub + Docs. `tinity me` is the only accent action. |
 | Status | `#status`. One-column right-aligned head: `RUNS ON v0.1.0` + `17 IDLE`, then 17 pips packed to the right. `idle` is grayscale. `live` may use the 4–8px green halo. |
-| Hub | `#hub`. Split head (title left, dek left-aligned). Square sectional rack, Tinity LED at the shared origin, orthogonal traces. 17 bidirectional traffic dots. `prefers-reduced-motion` is static. Mobile: stacked tiles. |
+| Hub | `#hub`. Split head (title left, dek right-aligned caption). Square sectional rack fills the inner width. Tinity LED at the shared origin, orthogonal traces. 17 bidirectional traffic dots. `prefers-reduced-motion` is static. Mobile: stacked tiles. |
 | Slices | `#slices`. Six square `.panel` cells. No shipped tick. Badges: SHIPPED fill, IN DESIGN outline, NEXT/LATER dim. Square, not pills. |
 | Changelog | `#changelog`. Three dated `.panel` cards. Full changelog opens a window. |
 | Community | `#community`. GitHub, X, Slack coming. One Contribute ghost. |

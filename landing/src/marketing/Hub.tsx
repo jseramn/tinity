@@ -16,7 +16,7 @@ import {
 import { MARK_VIEWBOX, MarkSvg } from "./Lockup";
 import { Section } from "./Section";
 
-const NODE = 44;
+const NODE = 56;
 
 type Traffic = {
   dir: "send" | "receive";
@@ -60,7 +60,7 @@ export function Hub() {
             viewBox={`0 0 ${HUB_SIZE} ${HUB_SIZE}`}
             aria-hidden="true"
           >
-            <g fill="none" stroke="var(--hairline)" strokeWidth="1">
+            <g fill="none" stroke="var(--hairline)" strokeWidth="1.25">
               {nodes.map((node) => (
                 <path
                   key={node.id}
@@ -80,7 +80,7 @@ export function Hub() {
                   return (
                     <circle
                       key={`dot-${node.id}`}
-                      r="3"
+                      r="4.5"
                       className="hub-dot"
                       fill="#1fdb12"
                     >
@@ -119,10 +119,10 @@ export function Hub() {
                   />
                   <image
                     href={markSrcFor(harness.id)}
-                    x="-12"
-                    y="-12"
-                    width="24"
-                    height="24"
+                    x="-16"
+                    y="-16"
+                    width="32"
+                    height="32"
                   />
                 </g>
               );
@@ -135,7 +135,7 @@ export function Hub() {
                 data-status={harness.status}
                 title={harnessTooltip(harness.label, harness.status)}
               >
-                <HarnessMark harness={harness} size={24} lazy />
+                <HarnessMark harness={harness} size={28} lazy />
                 <span>{harness.label}</span>
               </li>
             ))}
