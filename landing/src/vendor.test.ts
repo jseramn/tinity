@@ -24,6 +24,19 @@ describe("vendor copy", () => {
 });
 
 describe("html shell", () => {
+  it("loads the full Geist pair from DESIGN.md", () => {
+    const main = readFileSync("src/main.tsx", "utf8");
+    const tokens = readFileSync("src/styles/tokens.css", "utf8");
+    expect(main).toContain("@fontsource/geist-sans/400.css");
+    expect(main).toContain("@fontsource/geist-sans/500.css");
+    expect(main).toContain("@fontsource/geist-sans/600.css");
+    expect(main).toContain("@fontsource/geist-mono/400.css");
+    expect(main).toContain("@fontsource/geist-mono/500.css");
+    expect(tokens).toContain('"Geist Sans", "Geist"');
+    expect(tokens).toContain('"Geist Mono"');
+    expect(tokens).not.toMatch(/backdrop-filter/);
+  });
+
   it("sets title, short manifesto description, and accent theme-color", () => {
     const html = readFileSync("index.html", "utf8");
     expect(html).toMatch(/<title>Tinity<\/title>/);

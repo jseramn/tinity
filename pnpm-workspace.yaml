@@ -1,0 +1,5 @@
+packages:
+  - landing
+  - packages/*
+allowBuilds:
+  esbuild: true

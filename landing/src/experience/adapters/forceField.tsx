@@ -14,6 +14,7 @@ import { FIELD_OPTIONS } from "./options";
 
 export type ForceFieldHandle = {
   impact: (x: number, y: number) => void;
+  resize: () => void;
 };
 
 type Props = {
@@ -34,6 +35,9 @@ export const ForceFieldAdapter = forwardRef<ForceFieldHandle, Props>(
     useImperativeHandle(ref, () => ({
       impact(x, y) {
         instanceRef.current?.impact(x, y);
+      },
+      resize() {
+        instanceRef.current?.resize();
       },
     }));
 

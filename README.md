@@ -1,6 +1,18 @@
 # Tinity
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel)](https://vercel.com/?utm_source=tinity&utm_campaign=oss)
+[![made with canvasui](https://img.shields.io/badge/made%20with-canvasui-1fdb12)](https://canvasui.dev)
+
 Tinity is an agentic systems engineering framework: a harness-of-harnesses for AI testing and evaluation. It exists to work alongside other harnesses, not to replace them — a friend to all harnesses. Layer 8 will be agent-based: orchestrate runtimes, sandboxes, and fleets so developers can study, evaluate, and ship with advanced tools.
+
+## Links
+
+Public landing path is `/tinity/` (`vercel.json`). This repo does not record a live production URL.
+
+- X [@jseramn_](https://x.com/jseramn_)
+- X [@tinityorch](https://x.com/tinityorch)
+- [jseramn.tech](https://jseramn.tech)
 
 ## Current state
 

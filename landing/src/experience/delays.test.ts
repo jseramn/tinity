@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { AGENTS } from "./agents";
 import {
   ctaOrigin,
   flipAxis,
@@ -17,6 +18,7 @@ const tile: Tile = {
   x: 100,
   y: 40,
   size: 80,
+  inside: true,
 };
 
 const cta: Tile = {
@@ -27,6 +29,7 @@ const cta: Tile = {
   x: 200,
   y: 120,
   size: 80,
+  inside: true,
 };
 
 const occupancy: Tile = {
@@ -37,6 +40,7 @@ const occupancy: Tile = {
   x: 300,
   y: 200,
   size: 80,
+  inside: true,
 };
 
 describe("flipDelay", () => {
@@ -58,9 +62,9 @@ describe("flipDelay", () => {
 
 describe("flipTargets and ctaOrigin", () => {
   it("returns only role === number tiles and omits occupancy and CTA", () => {
-    const numbered = Array.from({ length: 14 }, (_, i) => ({
+    const numbered = Array.from({ length: 17 }, (_, i) => ({
       ...tile,
-      id: String(i + 1).padStart(2, "0"),
+      id: AGENTS[i]?.id ?? String(i + 1),
       col: i,
     }));
     const tiles: Tile[] = [cta, occupancy, occupancy, ...numbered];

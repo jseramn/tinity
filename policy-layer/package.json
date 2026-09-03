@@ -1,0 +1,19 @@
+{
+  "name": "@tinity/policy-layer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Tinity Layer 8 — policy, audit, escalation over the Slack+OpenClaw bus",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.0",
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.11"
+  }
+}

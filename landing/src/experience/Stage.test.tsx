@@ -1,18 +1,38 @@
 import { readFileSync } from "node:fs";
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import * as ForceField from "../components/canvasui/ForceField";
+import { AGENTS } from "./agents";
 import { MANIFESTO } from "./copy";
 import { ctaOrigin, flipAxis, flipTilt } from "./delays";
 import { Stage } from "./Stage";
 import { layoutTiles } from "./tiles";
 
-function expectedNumberCount() {
+const DEFAULT_VIEWPORT = {
+  w: window.innerWidth,
+  h: window.innerHeight,
+};
+
+function reservedRowsFor(height: number): number {
+  return window.matchMedia("(pointer: coarse)").matches || height < 700 ? 1 : 0;
+}
+
+function currentLayout() {
   return layoutTiles(
     window.innerWidth,
     window.innerHeight,
     Math.min(window.devicePixelRatio || 1, 2),
-  ).filter((tile) => tile.role === "number").length;
+    { reservedRows: reservedRowsFor(window.innerHeight) },
+  );
+}
+
+function currentTiles() {
+  return currentLayout().tiles;
+}
+
+function expectedNumberCount() {
+  return currentTiles().filter((tile) => tile.role === "number").length;
 }
 
 function spyAnimate() {
@@ -25,10 +45,14 @@ function spyAnimate() {
   return vi.spyOn(proto, "animate");
 }
 
-function stubMatchMedia(reduce: boolean) {
-  window.matchMedia = (query: string) =>
-    ({
-      matches: reduce && query.includes("prefers-reduced-motion"),
+function stubMatchMedia(reduce: boolean, pointer: "fine" | "coarse" = "fine") {
+  window.matchMedia = (query: string) => {
+    let matches = false;
+    if (query.includes("prefers-reduced-motion")) matches = reduce;
+    if (query.includes("pointer: fine")) matches = pointer === "fine";
+    if (query.includes("pointer: coarse")) matches = pointer === "coarse";
+    return {
+      matches,
       media: query,
       onchange: null,
       addEventListener() {},
@@ -36,7 +60,43 @@ function stubMatchMedia(reduce: boolean) {
       addListener() {},
       removeListener() {},
       dispatchEvent: () => false,
-    }) as MediaQueryList;
+    } as MediaQueryList;
+  };
+}
+
+function setViewport(width: number, height: number) {
+  Object.defineProperty(window, "innerWidth", {
+    configurable: true,
+    value: width,
+  });
+  Object.defineProperty(window, "innerHeight", {
+    configurable: true,
+    value: height,
+  });
+}
+
+function stubFieldImpact() {
+  const impact = vi.fn();
+  vi.spyOn(ForceField, "createForceField").mockReturnValue({
+    impact,
+    setOptions: vi.fn(),
+    resize: vi.fn(),
+    destroy: vi.fn(),
+  });
+  return impact;
+}
+
+function agentPositions() {
+  return [...numberCubes()]
+    .map((cube) => {
+      const el = cube as HTMLElement;
+      return [
+        cube.querySelector("[data-agent]")?.getAttribute("data-agent") ?? "",
+        el.style.left,
+        el.style.top,
+      ].join(":");
+    })
+    .sort();
 }
 
 function numberCubes() {
@@ -56,9 +116,7 @@ function fieldCanvases() {
 }
 
 function cubeBack(id: string) {
-  return [...document.querySelectorAll(".cube-face--back")].find(
-    (el) => el.textContent === id,
-  );
+  return document.querySelector(`[data-agent="${id}"]`);
 }
 
 function cssVar(el: Element, name: string) {
@@ -69,16 +127,13 @@ function numberCubeEl(id: string) {
   return cubeBack(id)?.closest(".cube") as HTMLElement | undefined;
 }
 
-function currentLayout() {
-  return layoutTiles(
-    window.innerWidth,
-    window.innerHeight,
-    Math.min(window.devicePixelRatio || 1, 2),
-  );
-}
-
 describe("Stage experience loop", () => {
   afterEach(() => {
+    setViewport(DEFAULT_VIEWPORT.w, DEFAULT_VIEWPORT.h);
+    Object.defineProperty(window, "devicePixelRatio", {
+      configurable: true,
+      value: 1,
+    });
     stubMatchMedia(false);
     vi.restoreAllMocks();
   });
@@ -103,20 +158,24 @@ describe("Stage experience loop", () => {
     expect(cta.style.background).not.toMatch(/accent|#1fdb12/i);
     expect(cta.style.getPropertyValue("--cell-css")).toMatch(/px$/);
     expect(fieldCanvases().length).toBeGreaterThan(0);
+    expect(document.querySelector(".stage-slot .overlay")).toBeTruthy();
+    expect(document.querySelector(".stage > .overlay")).toBeNull();
     expect(screen.queryByText(MANIFESTO)).not.toBeInTheDocument();
-    const back01 = cubeBack("01");
-    expect(back01).toHaveAttribute("aria-hidden", "true");
-    const visible01 = screen.queryByText("01");
-    if (visible01) {
-      expect(visible01).toHaveAttribute("aria-hidden", "true");
-    }
+    expect(screen.queryByText("01")).not.toBeInTheDocument();
+    const first = cubeBack(AGENTS[0].id);
+    expect(first).toHaveAttribute("aria-hidden", "true");
+    expect(first?.querySelector("img.cube-mark")).toHaveAttribute(
+      "alt",
+      AGENTS[0].label,
+    );
+    expect(document.querySelectorAll(".cube-mark")).toHaveLength(expected);
   });
 
   it("gives idle numbered cubes two faces, a spine, and unitless flip axes from the CTA", async () => {
     stubMatchMedia(false);
     render(<Stage />);
     await screen.findByRole("button", { name: "tinity me" });
-    const tiles = currentLayout();
+    const tiles = currentTiles();
     const origin = ctaOrigin(tiles);
     expect(origin).not.toBeNull();
     const numbered = tiles.filter((tile) => tile.role === "number");
@@ -149,7 +208,7 @@ describe("Stage experience loop", () => {
     stubMatchMedia(false);
     render(<Stage />);
     await screen.findByRole("button", { name: "tinity me" });
-    const tiles = currentLayout();
+    const tiles = currentTiles();
     const origin = ctaOrigin(tiles);
     expect(origin).not.toBeNull();
     const numbered = tiles.filter((tile) => tile.role === "number");
@@ -159,7 +218,14 @@ describe("Stage experience loop", () => {
       expect(cube).toBeTruthy();
       const tumble = cube!.querySelector(":scope > .cube-tumble");
       expect(tumble).toBeTruthy();
-      expect(tumble!.querySelector(":scope > .cube-inner")).toBeTruthy();
+      expect(tumble!.querySelector(":scope > .cube-lift > .cube-inner")).toBeTruthy();
+      expect(cube!.querySelector(".cube-face--front")).toBeTruthy();
+      expect(cube!.querySelector(".cube-spine")).toBeTruthy();
+      expect(cube!.querySelector(".cube-face--back")).toBeTruthy();
+      expect(cube!.querySelector(".cube-label")).toHaveAttribute(
+        "aria-hidden",
+        "true",
+      );
       expect(cssVar(cube!, "--flip-tilt")).toBe(String(flipTilt(tile, origin!)));
     }
     const occupancy = occupancyCubes();
@@ -172,6 +238,7 @@ describe("Stage experience loop", () => {
     const cta = screen.getByRole("button", { name: "tinity me" });
     expect(cta).not.toHaveClass("is-flipped");
     expect(cta.querySelector(".cube-tumble")).toBeNull();
+    expect(cta.querySelector(".cube-lift")).toBeTruthy();
     expect(cssVar(cta, "--flip-tilt")).toBe("");
   });
 
@@ -179,7 +246,7 @@ describe("Stage experience loop", () => {
     stubMatchMedia(false);
     render(<Stage />);
     await screen.findByRole("button", { name: "tinity me" });
-    const tiles = currentLayout();
+    const tiles = currentTiles();
     const origin = ctaOrigin(tiles);
     expect(origin).not.toBeNull();
     const numbered = tiles.filter((tile) => tile.role === "number");
@@ -220,21 +287,30 @@ describe("Stage experience loop", () => {
     expect(Math.sign(southX)).toBe(-Math.sign(northX));
   });
 
-  it("flips 01 and the last numbered id on click without flipping occupancy or showing manifesto", async () => {
+  it("flips the first and last agent marks on click without flipping occupancy or showing manifesto", async () => {
     stubMatchMedia(false);
     const animate = spyAnimate();
     const user = userEvent.setup();
     render(<Stage />);
     const cta = await screen.findByRole("button", { name: "tinity me" });
     const expected = expectedNumberCount();
-    const lastId = String(expected).padStart(2, "0");
+    const lastId = AGENTS[expected - 1]?.id;
+    expect(lastId).toBeDefined();
     expect(fieldCanvases().length).toBeGreaterThan(0);
     await user.click(cta);
 
     await waitFor(() => {
-      expect(cubeBack("01")?.closest(".cube")).toHaveClass("is-flipped");
-      expect(cubeBack(lastId)?.closest(".cube")).toHaveClass("is-flipped");
+      expect(cubeBack(AGENTS[0].id)?.closest(".cube")).toHaveClass("is-flipped");
+      expect(cubeBack(lastId!)?.closest(".cube")).toHaveClass("is-flipped");
     });
+    expect(cubeBack(AGENTS[0].id)?.querySelector("a.cube-mark-link")).toHaveAttribute(
+      "href",
+      AGENTS[0].href,
+    );
+    expect(cubeBack(lastId!)?.querySelector("a.cube-mark-link")).toHaveAttribute(
+      "href",
+      AGENTS[expected - 1]?.href,
+    );
     expect(animate).not.toHaveBeenCalled();
     expect(cta).not.toHaveClass("is-flipped");
     expect(cta.querySelector(".cube-tumble")).toBeNull();
@@ -253,7 +329,7 @@ describe("Stage experience loop", () => {
     expect(screen.queryByText(MANIFESTO)).not.toBeInTheDocument();
   });
 
-  it("returns to idle unflipped occupancy after a second click with Force Field still mounted", async () => {
+  it("shuffles agents on a second click and stays revealed", async () => {
     stubMatchMedia(false);
     const user = userEvent.setup();
     render(<Stage />);
@@ -263,20 +339,197 @@ describe("Stage experience loop", () => {
     await waitFor(() => {
       expect(flippedNumberCubes()).toHaveLength(expected);
     });
+    const before = agentPositions();
     await user.click(cta);
+    expect(screen.getByRole("button", { name: "tinity me" })).toBeInTheDocument();
+    expect(cta).toHaveAttribute("aria-describedby", "cta-hint");
+    expect(cta).not.toHaveClass("is-armed");
+    expect(screen.getByText("Shuffle the agents")).toHaveClass("sr-only");
+    await waitFor(() => {
+      expect(agentPositions()).not.toEqual(before);
+    });
+    await waitFor(() => {
+      expect(flippedNumberCubes()).toHaveLength(expected);
+    });
     expect(numberCubes()).toHaveLength(expected);
-    expect(flippedNumberCubes()).toHaveLength(0);
-    expect(numberCubes().length).toBeGreaterThan(0);
-    for (const cube of numberCubes()) {
-      expect(cube).not.toHaveClass("is-flipped");
-      expect(cube.querySelector(":scope > .cube-tumble > .cube-inner")).toBeTruthy();
-    }
-    for (const cube of occupancyCubes()) {
-      expect(cube).not.toHaveClass("is-flipped");
-      expect(cube.querySelector(".cube-tumble")).toBeNull();
-    }
     expect(fieldCanvases().length).toBeGreaterThan(0);
-    expect(screen.queryByText(MANIFESTO)).not.toBeInTheDocument();
+  });
+
+  it("returns to idle unflipped occupancy on Escape and keeps board positions", async () => {
+    stubMatchMedia(false);
+    const user = userEvent.setup();
+    render(<Stage />);
+    const cta = await screen.findByRole("button", { name: "tinity me" });
+    await user.click(cta);
+    const expected = expectedNumberCount();
+    await waitFor(() => {
+      expect(flippedNumberCubes()).toHaveLength(expected);
+    });
+    const before = agentPositions();
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(flippedNumberCubes()).toHaveLength(0);
+    expect(cta).toHaveClass("is-armed");
+    expect(cta).not.toHaveAttribute("aria-describedby");
+    expect(agentPositions()).toEqual(before);
+    expect(fieldCanvases().length).toBeGreaterThan(0);
+  });
+
+  it("clips leftmost and rightmost cubes equally at 1728×807 and pads the slot", async () => {
+    stubMatchMedia(false);
+    setViewport(1728, 807);
+    render(<Stage />);
+    await screen.findByRole("button", { name: "tinity me" });
+    const layout = currentLayout();
+    expect(layout.padX).toBeGreaterThan(0);
+    expect(layout.padY).toBe(0);
+    const slot = document.querySelector(".stage-slot") as HTMLElement;
+    expect(parseFloat(slot.style.left)).toBeCloseTo(-layout.padX);
+    expect(parseFloat(slot.style.right)).toBeCloseTo(-layout.padX);
+    expect(parseFloat(slot.style.top || "0")).toBeCloseTo(0);
+    expect(parseFloat(slot.style.bottom || "0")).toBeCloseTo(0);
+    const cubes = [...document.querySelectorAll(".cube")] as HTMLElement[];
+    const minLeft = Math.min(...cubes.map((cube) => parseFloat(cube.style.left)));
+    const maxRight = Math.max(
+      ...cubes.map(
+        (cube) => parseFloat(cube.style.left) + parseFloat(cube.style.width),
+      ),
+    );
+    expect(minLeft).toBeCloseTo(0);
+    expect(maxRight).toBeCloseTo(1728 + 2 * layout.padX);
+    const leftTile = layout.tiles.find((tile) => tile.col === 0)!;
+    const rightTile = layout.tiles.find((tile) => tile.col === layout.cols - 1)!;
+    const leftClip = 0 - leftTile.x;
+    const rightClip = rightTile.x + rightTile.size - 1728;
+    expect(leftClip).toBeCloseTo(rightClip);
+    expect(leftClip).toBeCloseTo(layout.padX);
+    expect(leftTile.x).toBeCloseTo(layout.offsetX);
+  });
+
+  it("places each cube at col×cellCss inside a slot inset by −padX", async () => {
+    stubMatchMedia(false);
+    setViewport(1728, 807);
+    Object.defineProperty(window, "devicePixelRatio", {
+      configurable: true,
+      value: 0.9,
+    });
+    render(<Stage />);
+    await screen.findByRole("button", { name: "tinity me" });
+    const layout = currentLayout();
+    expect(9 * layout.cellCss).toBe(807);
+    const slot = document.querySelector(".stage-slot") as HTMLElement;
+    expect(parseFloat(slot.style.left)).toBeCloseTo(-layout.padX);
+    expect(parseFloat(slot.style.right)).toBeCloseTo(-layout.padX);
+    const cubes = [...document.querySelectorAll(".cube")] as HTMLElement[];
+    expect(cubes.length).toBeGreaterThan(0);
+    for (const cube of cubes) {
+      const left = parseFloat(cube.style.left);
+      const col = Math.round(left / layout.cellCss);
+      expect(left).toBeCloseTo(col * layout.cellCss);
+    }
+    const first = cubes.reduce((min, cube) =>
+      parseFloat(cube.style.left) < parseFloat(min.style.left) ? cube : min,
+    );
+    expect(parseFloat(first.style.left)).toBeCloseTo(0);
+  });
+
+  it("keeps bottom-row agent cubes within the stage height at 1728×807", async () => {
+    stubMatchMedia(false);
+    setViewport(1728, 807);
+    Object.defineProperty(window, "devicePixelRatio", {
+      configurable: true,
+      value: 0.9,
+    });
+    render(<Stage />);
+    await screen.findByRole("button", { name: "tinity me" });
+    const stageH = window.innerHeight;
+    const agents = [...document.querySelectorAll(".cube--number")] as HTMLElement[];
+    expect(agents.length).toBe(AGENTS.length);
+    for (const cube of agents) {
+      const top = parseFloat(cube.style.top);
+      const size = parseFloat(cube.style.height);
+      expect(top + size).toBeLessThanOrEqual(stageH + 0.5);
+    }
+  });
+
+  it("drags a flipped cube onto an empty cell and ripples at the drop", async () => {
+    stubMatchMedia(false);
+    const impact = stubFieldImpact();
+    const user = userEvent.setup();
+    render(<Stage />);
+    const cta = await screen.findByRole("button", { name: "tinity me" });
+    await user.click(cta);
+    const cube = await waitFor(() => {
+      const el = numberCubeEl(AGENTS[0].id);
+      expect(el).toHaveClass("is-flipped");
+      return el!;
+    });
+    impact.mockClear();
+    const layout = currentLayout();
+    const empty = layout.tiles.find(
+      (tile) => tile.role === "occupancy" && tile.inside,
+    )!;
+    const destLeft = empty.x + layout.padX;
+    const destTop = empty.y + layout.padY;
+    const dx = destLeft - parseFloat(cube.style.left);
+    const dy = destTop - parseFloat(cube.style.top);
+    fireEvent.pointerDown(cube, {
+      button: 0,
+      clientX: 0,
+      clientY: 0,
+      pointerId: 1,
+    });
+    fireEvent.pointerMove(cube, {
+      clientX: dx,
+      clientY: dy,
+      pointerId: 1,
+    });
+    fireEvent.pointerUp(cube, {
+      button: 0,
+      clientX: dx,
+      clientY: dy,
+      pointerId: 1,
+    });
+    await waitFor(() => {
+      expect(parseFloat(cube.style.left)).toBeCloseTo(destLeft);
+      expect(parseFloat(cube.style.top)).toBeCloseTo(destTop);
+    });
+    expect(impact).toHaveBeenCalled();
+    expect(impact.mock.calls[0]?.[0]).toBeCloseTo(
+      empty.x + empty.size / 2 + layout.padX,
+    );
+    expect(impact.mock.calls[0]?.[1]).toBeCloseTo(
+      empty.y + empty.size / 2 + layout.padY,
+    );
+  });
+
+  it("keeps the agent link navigable when the pointer did not move", async () => {
+    stubMatchMedia(false);
+    const user = userEvent.setup();
+    render(<Stage />);
+    const cta = await screen.findByRole("button", { name: "tinity me" });
+    await user.click(cta);
+    const cube = await waitFor(() => {
+      const el = numberCubeEl(AGENTS[0].id);
+      expect(el).toHaveClass("is-flipped");
+      return el!;
+    });
+    const link = cube.querySelector("a.cube-mark-link");
+    expect(link).toBeTruthy();
+    fireEvent.pointerDown(cube, {
+      button: 0,
+      clientX: 40,
+      clientY: 40,
+      pointerId: 1,
+    });
+    fireEvent.pointerUp(cube, {
+      button: 0,
+      clientX: 40,
+      clientY: 40,
+      pointerId: 1,
+    });
+    const event = new MouseEvent("click", { bubbles: true, cancelable: true });
+    link!.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(false);
   });
 
   it("flips numbered cubes instantly under reduced motion without manifesto", async () => {
@@ -294,6 +547,40 @@ describe("Stage experience loop", () => {
     }
     expect(fieldCanvases().length).toBeGreaterThan(0);
     expect(screen.queryByText(MANIFESTO)).not.toBeInTheDocument();
+  });
+
+  it("decrypts the agent label when hovering a flipped numbered cube", async () => {
+    stubMatchMedia(false);
+    const user = userEvent.setup();
+    render(<Stage />);
+    const cta = await screen.findByRole("button", { name: "tinity me" });
+    await user.click(cta);
+    await waitFor(() => {
+      expect(cubeBack(AGENTS[0].id)?.closest(".cube")).toHaveClass("is-flipped");
+    });
+    for (const cube of occupancyCubes()) {
+      expect(cube.textContent).toBe("");
+    }
+    const cube = cubeBack(AGENTS[0].id)!.closest(".cube") as HTMLElement;
+    const label = cube.querySelector(".cube-label");
+    expect(label).toBeTruthy();
+    const pending: FrameRequestCallback[] = [];
+    vi.stubGlobal("requestAnimationFrame", (cb: FrameRequestCallback) => {
+      pending.push(cb);
+      return pending.length;
+    });
+    vi.stubGlobal("cancelAnimationFrame", () => {});
+    fireEvent.pointerEnter(cube);
+    act(() => {
+      let now = 0;
+      for (let i = 0; i < 24 && pending.length > 0; i += 1) {
+        const batch = pending.splice(0, pending.length);
+        now += 70;
+        for (const cb of batch) cb(now);
+      }
+    });
+    expect(label).toHaveTextContent(AGENTS[0].label);
+    vi.unstubAllGlobals();
   });
 });
 
@@ -436,5 +723,24 @@ describe("numbered cube tokens", () => {
     expect(src).toMatch(/prev\.flipTilt === next\.flipTilt/);
     expect(src).not.toMatch(/from ["']three["']/);
     expect(src).not.toMatch(/\.animate\(/);
+  });
+
+  it("gives pointer-events only to flipped numbered cubes and keeps overlay inert", () => {
+    expect(tokensCss).toMatch(
+      /\.cube--number\.is-flipped\s*\{[^}]*pointer-events:\s*auto/,
+    );
+    expect(tokensCss).toMatch(/\.overlay\s*\{[^}]*pointer-events:\s*none/);
+    expect(tokensCss).toMatch(
+      /@media \(prefers-reduced-motion:\s*reduce\)[\s\S]*\.cube-lift[\s\S]*transform:\s*none/,
+    );
+    // Drag translate lives on .cube.is-dragging; overlay stays inert for empty cells.
+    expect(tokensCss).toMatch(/\.cube\.is-dragging\s*\{[^}]*transform:\s*translate/);
+    expect(tokensCss).toMatch(/height:\s*100dvh/);
+    expect(tokensCss).not.toMatch(/width:\s*100vw/);
+    expect(tokensCss).toMatch(
+      /html\s*,\s*body\s*,\s*#root\s*\{[^}]*overflow:\s*hidden/,
+    );
+    expect(tokensCss).toMatch(/\.stage\s*\{[^}]*box-sizing:\s*border-box/);
+    expect(tokensCss).toMatch(/\.sr-only\s*\{/);
   });
 });

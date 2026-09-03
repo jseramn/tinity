@@ -1,5 +1,5 @@
 export type Phase = "loader" | "idle" | "revealed";
-export type Event = { type: "ready" | "cta" };
+export type Event = { type: "ready" | "cta" | "escape" };
 export type Slot = "field";
 
 export function reduce(
@@ -11,9 +11,10 @@ export function reduce(
     case "ready":
       return phase === "loader" ? "idle" : phase;
     case "cta":
-      if (phase === "idle") return "revealed";
-      if (phase === "revealed") return "idle";
+      if (phase === "idle" || phase === "revealed") return "revealed";
       return phase;
+    case "escape":
+      return phase === "revealed" ? "idle" : phase;
     default:
       return phase;
   }

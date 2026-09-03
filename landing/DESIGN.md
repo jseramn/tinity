@@ -109,7 +109,7 @@ Info blue is utility only (links in docs, external refs). Never brand.
 
 Pair (Vercel + xAI):
 
-- **UI / display / body:** `Geist Sans`, fallback `ui-sans-serif, system-ui, sans-serif`
+- **UI / display / body:** `Geist Sans` (same face as `Geist` on jseramn.tech), fallback `ui-sans-serif, system-ui, sans-serif`
 - **Code / labels / eyebrows / metrics:** `Geist Mono`, fallback `ui-monospace, SFMono-Regular, Menlo, monospace`
 
 No serif. No third family. No italics except inline emphasis in prose.
@@ -346,7 +346,7 @@ Bias: rack, LED, runtime, quiet luxury of infrastructure.
   --text-muted: #a3a3a3;
   --border: #262626;
   --radius: 8px;
-  --font-sans: "Geist Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Geist Sans", "Geist", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 

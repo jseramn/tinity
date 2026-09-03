@@ -34,10 +34,12 @@ const fill: CSSProperties = {
 };
 
 const contentStyle: CSSProperties = {
-  position: "relative",
+  position: "absolute",
+  inset: 0,
   width: "100%",
   height: "100%",
-  overflow: "auto",
+  overflow: "visible",
+  zIndex: 2,
 };
 
 export function CanvasEffectHost({
@@ -74,16 +76,16 @@ export function CanvasEffectHost({
           </div>
         ) : null}
       </canvas>
-      {native ? null : (
-        <div ref={contentRef} style={contentStyle}>
-          {children}
-        </div>
-      )}
       <canvas
         ref={outputRef}
         aria-hidden
         style={{ ...fill, pointerEvents: "none" }}
       />
+      {native ? null : (
+        <div ref={contentRef} style={contentStyle}>
+          {children}
+        </div>
+      )}
     </div>
   );
 }

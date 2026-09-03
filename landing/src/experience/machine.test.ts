@@ -13,9 +13,12 @@ describe("experience machine", () => {
     expect(step("revealed", "ready")).toBe("revealed");
   });
 
-  it("toggles idle and revealed on the public click path", () => {
+  it("reveals on cta, stays revealed on a second cta, and returns to idle on escape", () => {
     expect(step("idle", "cta")).toBe("revealed");
-    expect(step("revealed", "cta")).toBe("idle");
+    expect(step("revealed", "cta")).toBe("revealed");
+    expect(step("revealed", "escape")).toBe("idle");
+    expect(step("idle", "escape")).toBe("idle");
+    expect(step("loader", "escape")).toBe("loader");
   });
 
   it("keeps slotFor on field for every phase", () => {
@@ -34,10 +37,13 @@ describe("experience machine", () => {
     expect(phase).toBe("revealed");
     expect(slotFor(phase)).toBe("field");
     phase = step(phase, "cta");
+    expect(phase).toBe("revealed");
+    expect(slotFor(phase)).toBe("field");
+    phase = step(phase, "escape");
     expect(phase).toBe("idle");
     expect(slotFor(phase)).toBe("field");
-    const events: Event["type"][] = ["ready", "cta"];
-    expect(events).toEqual(["ready", "cta"]);
+    const events: Event["type"][] = ["ready", "cta", "escape"];
+    expect(events).toEqual(["ready", "cta", "escape"]);
     expect(phase).toBe("idle");
   });
 });
