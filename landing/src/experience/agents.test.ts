@@ -90,9 +90,9 @@ describe("agent catalog", () => {
       expect(svg).toBeNull();
       expect(img).toBeTruthy();
       expect(img).toHaveAttribute("alt", agent.label);
-      expect(img?.getAttribute("src") ?? "").toMatch(
-        new RegExp(`${agent.id}\\.png`),
-      );
+      const src = img?.getAttribute("src") ?? "";
+      expect(src).not.toBe("[object Object]");
+      expect(src).toMatch(new RegExp(`${agent.id}\\.png`));
       expect(link).toHaveAttribute("href", agent.href);
       expect(link).toHaveAttribute("target", "_blank");
       expect(link).toHaveAttribute("rel", "noopener noreferrer");
