@@ -109,21 +109,23 @@ export function Hub() {
                   transform={`translate(${node.x * HUB_SIZE} ${node.y * HUB_SIZE})`}
                 >
                   <title>{tip}</title>
-                  <rect
-                    x={-NODE / 2}
-                    y={-NODE / 2}
-                    width={NODE}
-                    height={NODE}
-                    fill="#111111"
-                    stroke="#262626"
-                  />
-                  <image
-                    href={markSrcFor(harness.id)}
-                    x="-16"
-                    y="-16"
-                    width="32"
-                    height="32"
-                  />
+                  <g className="hub-node-lift">
+                    <rect
+                      x={-NODE / 2}
+                      y={-NODE / 2}
+                      width={NODE}
+                      height={NODE}
+                      fill="#111111"
+                      stroke="#262626"
+                    />
+                    <image
+                      href={markSrcFor(harness.id)}
+                      x="-16"
+                      y="-16"
+                      width="32"
+                      height="32"
+                    />
+                  </g>
                 </g>
               );
             })}
