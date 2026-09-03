@@ -46,5 +46,8 @@ describe("html shell", () => {
     expect(html).toMatch(/Friend to all harnesses/);
     expect(html).toMatch(/Layer 8 will be agent-based/);
     expect(html).not.toContain(MANIFESTO);
+    expect(html).toMatch(/rel="alternate"\s+type="text\/markdown"/);
+    expect(html).toMatch(/id="tinity-state"/);
+    expect(html).toMatch(/SoftwareSourceCode/);
   });
 });

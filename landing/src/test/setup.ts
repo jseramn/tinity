@@ -22,6 +22,19 @@ if (!window.matchMedia) {
     }) as MediaQueryList;
 }
 
+if (typeof HTMLDialogElement !== "undefined") {
+  const proto = HTMLDialogElement.prototype;
+  if (typeof proto.showModal !== "function") {
+    proto.showModal = function showModal() {
+      this.setAttribute("open", "");
+    };
+    proto.close = function close() {
+      this.removeAttribute("open");
+      this.dispatchEvent(new Event("close"));
+    };
+  }
+}
+
 class LayoutObserverStub {
   observe() {}
   unobserve() {}

@@ -735,11 +735,12 @@ describe("numbered cube tokens", () => {
     );
     // Drag translate lives on .cube.is-dragging; overlay stays inert for empty cells.
     expect(tokensCss).toMatch(/\.cube\.is-dragging\s*\{[^}]*transform:\s*translate/);
-    expect(tokensCss).toMatch(/height:\s*100dvh/);
+    expect(tokensCss).toMatch(/\.stage\s*\{[^}]*height:\s*100%/);
     expect(tokensCss).not.toMatch(/width:\s*100vw/);
-    expect(tokensCss).toMatch(
+    expect(tokensCss).not.toMatch(
       /html\s*,\s*body\s*,\s*#root\s*\{[^}]*overflow:\s*hidden/,
     );
+    expect(tokensCss).toMatch(/\.stage\s*\{[^}]*overflow:\s*hidden/);
     expect(tokensCss).toMatch(/\.stage\s*\{[^}]*box-sizing:\s*border-box/);
     expect(tokensCss).toMatch(/\.sr-only\s*\{/);
   });

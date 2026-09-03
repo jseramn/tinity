@@ -7,6 +7,7 @@ import "@fontsource/geist-mono/400.css";
 import "@fontsource/geist-mono/500.css";
 import "./styles/tokens.css";
 import "./styles/credits.css";
+import "./styles/marketing.css";
 import { App } from "./App";
 
 const root = document.getElementById("root");
