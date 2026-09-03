@@ -406,7 +406,7 @@ One page. No subpages. Hash sections. Windows via `?w=`. Agent surface via `?sur
 |------|------|
 | Nav | 52px hairline. Lockup (24px mark + wordmark). HUMAN / AGENT. Ghost GitHub. Docs · soon. Under 768px: lockup + switch + menu dialog. |
 | Hero | `100svh` grid `auto 1fr auto`. Stage fills the middle. Caption: eyebrow `TINITY / HARNESS`, H1 "A friend to all harnesses.", one-line dek, ghost GitHub + Docs. `tinity me` is the only accent action. |
-| Status | `#status`. One-column left-aligned head: `RUNS ON v0.1.0` + `17 IDLE`, then 17 pips. `idle` is grayscale. `live` may use the 4–8px green halo. |
+| Status | `#status`. One-column right-aligned head: `RUNS ON v0.1.0` + `17 IDLE`, then 17 pips packed to the right. `idle` is grayscale. `live` may use the 4–8px green halo. |
 | Hub | `#hub`. Split head (title left, dek left-aligned). Square sectional rack, Tinity LED at the shared origin, orthogonal traces. 17 bidirectional traffic dots. `prefers-reduced-motion` is static. Mobile: stacked tiles. |
 | Slices | `#slices`. Six square `.panel` cells. No shipped tick. Badges: SHIPPED fill, IN DESIGN outline, NEXT/LATER dim. Square, not pills. |
 | Changelog | `#changelog`. Three dated `.panel` cards. Full changelog opens a window. |
