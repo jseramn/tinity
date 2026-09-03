@@ -1,10 +1,20 @@
 import { useRef } from "react";
 import { REPO_HREF } from "../content/version";
+import { GhostButton, GhostLink } from "./Ghost";
 import { Lockup } from "./Lockup";
-import { useSurface, useWindow } from "./shell";
+import { useWindow } from "./shell";
+import { SurfaceSwitch } from "./SurfaceSwitch";
+
+const DRAWER_HASHES = [
+  ["#status", "Status"],
+  ["#hub", "Hub"],
+  ["#slices", "Slices"],
+  ["#changelog", "Changelog"],
+  ["#community", "Community"],
+  ["#faq", "FAQ"],
+] as const;
 
 export function Nav() {
-  const { surface, setSurface } = useSurface();
   const { open } = useWindow();
   const menuRef = useRef<HTMLDialogElement>(null);
 
@@ -16,44 +26,18 @@ export function Nav() {
     <header className="nav">
       <Lockup />
       <div className="nav-end">
-        <div
-          className="surface-switch"
-          role="group"
-          aria-label="Page surface"
-        >
-          <button
-            type="button"
-            className="surface-switch-btn"
-            aria-pressed={surface === "human"}
-            onClick={() => setSurface("human")}
-          >
-            HUMAN
-          </button>
-          <button
-            type="button"
-            className="surface-switch-btn"
-            aria-pressed={surface === "agent"}
-            title="MCP-readable markdown surface with llms.txt twins"
-            onClick={() => setSurface("agent")}
-          >
-            AGENT
-          </button>
-        </div>
-        <a
-          className="btn-ghost nav-desktop"
+        <SurfaceSwitch />
+        <GhostLink
+          className="nav-desktop"
           href={REPO_HREF}
           target="_blank"
           rel="noopener noreferrer"
         >
           GitHub ↗
-        </a>
-        <button
-          type="button"
-          className="btn-ghost nav-desktop"
-          onClick={() => open("docs")}
-        >
+        </GhostLink>
+        <GhostButton className="nav-desktop" onClick={() => open("docs")}>
           Docs · soon
-        </button>
+        </GhostButton>
         <button
           type="button"
           className="nav-menu"
@@ -65,46 +49,24 @@ export function Nav() {
       </div>
       <dialog ref={menuRef} className="nav-drawer" onClose={closeMenu}>
         <form method="dialog">
-          <button type="submit" className="btn-ghost">
-            Close
-          </button>
+          <GhostButton type="submit">Close</GhostButton>
         </form>
-        <a
-          className="btn-ghost"
-          href={REPO_HREF}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <GhostLink href={REPO_HREF} target="_blank" rel="noopener noreferrer">
           GitHub ↗
-        </a>
-        <button
-          type="button"
-          className="btn-ghost"
+        </GhostLink>
+        <GhostButton
           onClick={() => {
             open("docs");
             closeMenu();
           }}
         >
           Docs · soon
-        </button>
-        <a className="btn-ghost" href="#status" onClick={closeMenu}>
-          Status
-        </a>
-        <a className="btn-ghost" href="#hub" onClick={closeMenu}>
-          Hub
-        </a>
-        <a className="btn-ghost" href="#slices" onClick={closeMenu}>
-          Slices
-        </a>
-        <a className="btn-ghost" href="#changelog" onClick={closeMenu}>
-          Changelog
-        </a>
-        <a className="btn-ghost" href="#community" onClick={closeMenu}>
-          Community
-        </a>
-        <a className="btn-ghost" href="#faq" onClick={closeMenu}>
-          FAQ
-        </a>
+        </GhostButton>
+        {DRAWER_HASHES.map(([href, label]) => (
+          <GhostLink key={href} href={href} onClick={closeMenu}>
+            {label}
+          </GhostLink>
+        ))}
       </dialog>
     </header>
   );

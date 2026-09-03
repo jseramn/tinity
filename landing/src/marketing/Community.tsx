@@ -1,41 +1,44 @@
 import { COMMUNITY } from "../content/community";
 import { REPO_ISSUES_HREF } from "../content/version";
-import { RevealSection } from "./RevealSection";
+import { GhostLink } from "./Ghost";
+import { Panel, PanelGrid } from "./Panel";
+import { Section } from "./Section";
 
 export function Community() {
   return (
-    <RevealSection
+    <Section.Root
       className="community"
       id="community"
       aria-labelledby="community-title"
     >
-      <div className="section-inner">
-        <p className="eyebrow" id="community-title">
-          COMMUNITY
-        </p>
-        <h2 className="section-title">We are still building this.</h2>
-        <p className="section-dek">
-          Channels are reserved. The public trail is GitHub.
-        </p>
-        <ul className="community-grid">
+      <Section.Inner>
+        <Section.Header>
+          <Section.Copy>
+            <Section.Eyebrow id="community-title">COMMUNITY</Section.Eyebrow>
+            <Section.Title>We are still building this.</Section.Title>
+          </Section.Copy>
+          <Section.Dek>
+            Channels are reserved. The public trail is GitHub.
+          </Section.Dek>
+        </Section.Header>
+        <PanelGrid>
           {COMMUNITY.map((item) => (
-            <li key={item.id} data-status={item.status}>
+            <Panel key={item.id} data-status={item.status}>
               <a href={item.href} target="_blank" rel="noopener noreferrer">
                 {item.label}
               </a>
-              <p>{item.dek}</p>
-            </li>
+              <p className="panel-dek">{item.dek}</p>
+            </Panel>
           ))}
-        </ul>
-        <a
-          className="btn-ghost"
+        </PanelGrid>
+        <GhostLink
           href={REPO_ISSUES_HREF}
           target="_blank"
           rel="noopener noreferrer"
         >
           Contribute
-        </a>
-      </div>
-    </RevealSection>
+        </GhostLink>
+      </Section.Inner>
+    </Section.Root>
   );
 }

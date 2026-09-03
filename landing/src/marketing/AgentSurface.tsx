@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { HARNESSES } from "../content/harnesses";
+import { REPO_HREF, VERSION } from "../content/version";
+import { GhostButton, GhostLink } from "./Ghost";
 import { Nav } from "./Nav";
 
 const SKELETON = `---
@@ -7,6 +10,44 @@ version: …
 ---
 
 Loading index.md…`;
+
+const TWINS = [
+  { file: "llms.txt", label: "llms.txt" },
+  { file: "index.md", label: "index.md" },
+  { file: "changelog.md", label: "changelog.md" },
+  { file: "design.md", label: "design.md" },
+] as const;
+
+function AgentToolbar({
+  copied,
+  ready,
+  onCopy,
+}: {
+  copied: boolean;
+  ready: boolean;
+  onCopy: () => void;
+}) {
+  return (
+    <div className="agent-toolbar">
+      <div className="agent-toolbar-actions">
+        <GhostButton disabled={!ready} onClick={onCopy}>
+          {copied ? "Copied" : "Copy page"}
+        </GhostButton>
+        {TWINS.map((twin) => (
+          <GhostLink key={twin.file} href={`${import.meta.env.BASE_URL}${twin.file}`}>
+            {twin.label}
+          </GhostLink>
+        ))}
+        <GhostLink href={REPO_HREF} target="_blank" rel="noopener noreferrer">
+          README
+        </GhostLink>
+      </div>
+      <p className="agent-toolbar-meta">
+        v{VERSION} · {HARNESSES.length} idle
+      </p>
+    </div>
+  );
+}
 
 export function AgentSurface() {
   const [text, setText] = useState<string | null>(null);
@@ -38,36 +79,7 @@ export function AgentSurface() {
   return (
     <div className="agent-surface">
       <Nav />
-      <div className="agent-toolbar">
-        <button
-          type="button"
-          className="btn-ghost"
-          disabled={!text}
-          onClick={() => void copy()}
-        >
-          {copied ? "Copied" : "Copy page"}
-        </button>
-        <a className="btn-ghost" href={`${import.meta.env.BASE_URL}llms.txt`}>
-          llms.txt
-        </a>
-        <a className="btn-ghost" href={`${import.meta.env.BASE_URL}index.md`}>
-          index.md
-        </a>
-        <a className="btn-ghost" href={`${import.meta.env.BASE_URL}changelog.md`}>
-          changelog.md
-        </a>
-        <a className="btn-ghost" href={`${import.meta.env.BASE_URL}design.md`}>
-          design.md
-        </a>
-        <a
-          className="btn-ghost"
-          href="https://github.com/jseramn/tinity"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          README
-        </a>
-      </div>
+      <AgentToolbar copied={copied} ready={Boolean(text)} onCopy={() => void copy()} />
       <pre className={`agent-md${text ? "" : " agent-md--loading"}`} aria-busy={!text}>
         {text ?? SKELETON}
       </pre>

@@ -406,15 +406,17 @@ One page. No subpages. Hash sections. Windows via `?w=`. Agent surface via `?sur
 |------|------|
 | Nav | 52px hairline. Lockup (24px mark + wordmark). HUMAN / AGENT. Ghost GitHub. Docs · soon. Under 768px: lockup + switch + menu dialog. |
 | Hero | `100svh` grid `auto 1fr auto`. Stage fills the middle. Caption: eyebrow `TINITY / HARNESS`, H1 "A friend to all harnesses.", one-line dek, ghost GitHub + Docs. `tinity me` is the only accent action. |
-| Status | `#status`. `RUNS ON v0.1.0` + 17 pips. `idle` is grayscale. `live` may use the 4–8px green halo. |
-| Hub | `#hub`. SVG ring, Tinity at center, spokes inbound. Dash-offset + a few traveling dots. `prefers-reduced-motion` is static. Mobile: stacked tiles. |
-| Slices | `#slices`. Six cells. Badges: SHIPPED fill, IN DESIGN outline, NEXT/LATER dim. |
-| Changelog | `#changelog`. Three dated cards. Full changelog opens a window. |
+| Status | `#status`. Split head: `RUNS ON v0.1.0` + `17 IDLE`. Then 17 pips. `idle` is grayscale. `live` may use the 4–8px green halo. |
+| Hub | `#hub`. Split head (title left, dek right). SVG ring, Tinity at center, spokes inbound. Dash-offset + a few traveling dots. `prefers-reduced-motion` is static. Mobile: stacked tiles. |
+| Slices | `#slices`. Six `.panel` cells. Shipped gets a 2px inset accent tick. Badges: SHIPPED fill, IN DESIGN outline, NEXT/LATER dim. |
+| Changelog | `#changelog`. Three dated `.panel` cards. Full changelog opens a window. |
 | Community | `#community`. GitHub, X, Slack coming. One Contribute ghost. |
 | FAQ | `#faq`. Five `details[name=faq]`. No JS accordion. |
 | Footer | Flow credits (not fixed). MIT + version. |
 
-Do not add an 8-item mega-nav. Do not wrap the hero in a card. Do not put a second primary next to `tinity me`.
+Marketing sections compose as `Section.Root / Inner / Header / Copy / Title / Dek`. Cards compose as `Panel` inside `PanelGrid`. Windows compose as `Window.Frame` + `Window.Docs` | `Window.Changelog`. Surfaces are explicit: `HumanSurface` vs `AgentSurface`.
+
+Do not add an 8-item mega-nav. Do not wrap the hero in a card. Do not put a second primary next to `tinity me`. Card hover is `--border-strong` only.
 
 Windows: one native `<dialog>`, max 720px, radius 12, 1px border plus the single allowed popover shadow, 180ms opacity + `translateY(4px)`. Backdrop `rgba(5,5,5,0.6)`.
 

@@ -15,6 +15,7 @@ describe("StatusBar", () => {
     const pips = screen.getAllByRole("listitem");
     expect(pips).toHaveLength(17);
     expect(HARNESSES).toHaveLength(17);
+    expect(screen.getByText("17 IDLE")).toBeInTheDocument();
     for (const pip of pips) {
       expect(pip).toHaveAttribute("data-status", "idle");
       expect(pip).toHaveAttribute("aria-label", expect.stringMatching(/ — idle$/));

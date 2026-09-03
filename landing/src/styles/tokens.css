@@ -24,6 +24,18 @@
   --font-sans: "Geist Sans", "Geist", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-ui: 120ms;
+  --duration-panel: 180ms;
+}
+
+::selection {
+  background: var(--accent-wash-dark);
+  color: var(--text);
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
 }
 
 html,

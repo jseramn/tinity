@@ -1,14 +1,16 @@
 import { FAQ } from "../content/faq";
-import { RevealSection } from "./RevealSection";
+import { Section } from "./Section";
 
 export function Faq() {
   return (
-    <RevealSection className="faq" id="faq" aria-labelledby="faq-title">
-      <div className="section-inner">
-        <p className="eyebrow" id="faq-title">
-          FAQ
-        </p>
-        <h2 className="section-title">Short answers while we apply to OSS.</h2>
+    <Section.Root className="faq" id="faq" aria-labelledby="faq-title">
+      <Section.Inner>
+        <Section.Header>
+          <Section.Copy>
+            <Section.Eyebrow id="faq-title">FAQ</Section.Eyebrow>
+            <Section.Title>Short answers while we apply to OSS.</Section.Title>
+          </Section.Copy>
+        </Section.Header>
         <div className="faq-list">
           {FAQ.map((item) => (
             <details key={item.id} name="faq" className="faq-item">
@@ -17,7 +19,7 @@ export function Faq() {
             </details>
           ))}
         </div>
-      </div>
-    </RevealSection>
+      </Section.Inner>
+    </Section.Root>
   );
 }

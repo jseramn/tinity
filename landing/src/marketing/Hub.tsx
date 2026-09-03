@@ -1,10 +1,11 @@
 import { HARNESSES } from "../content/harnesses";
 import { markSrcFor } from "../experience/AgentMark";
 import { usePrefersReducedMotion } from "../experience/motion";
+import { HarnessMark } from "./HarnessMark";
 import { harnessTooltip } from "./harnessStatus";
-import { MarkSvg } from "./Lockup";
 import { HUB_CX, HUB_CY, hubLayout, spokePath } from "./hubLayout";
-import { RevealSection } from "./RevealSection";
+import { MarkSvg } from "./Lockup";
+import { Section } from "./Section";
 
 const SIZE = 800;
 const DOT_INDEXES = [0, 4, 8, 12];
@@ -13,15 +14,17 @@ export function Hub() {
   const reduced = usePrefersReducedMotion();
   const nodes = hubLayout(HARNESSES.map((h) => h.id));
   return (
-    <RevealSection className="hub" id="hub" aria-labelledby="hub-title">
-      <div className="section-inner">
-        <p className="eyebrow" id="hub-title">
-          HUB
-        </p>
-        <h2 className="section-title">Tinity is the node between the harnesses.</h2>
-        <p className="section-dek">
-          Seventeen spokes in. Policy out, later. Today every rim node is idle.
-        </p>
+    <Section.Root className="hub" id="hub" aria-labelledby="hub-title">
+      <Section.Inner>
+        <Section.Header>
+          <Section.Copy>
+            <Section.Eyebrow id="hub-title">HUB</Section.Eyebrow>
+            <Section.Title>Tinity is the node between the harnesses.</Section.Title>
+          </Section.Copy>
+          <Section.Dek>
+            Seventeen spokes in. Policy out, later. Today every rim node is idle.
+          </Section.Dek>
+        </Section.Header>
         <figure
           className="hub-figure"
           role="img"
@@ -98,14 +101,7 @@ export function Hub() {
                 data-status={harness.status}
                 title={harnessTooltip(harness.label, harness.status)}
               >
-                <img
-                  src={markSrcFor(harness.id)}
-                  alt=""
-                  width={24}
-                  height={24}
-                  loading="lazy"
-                  decoding="async"
-                />
+                <HarnessMark harness={harness} size={24} lazy />
                 <span>{harness.label}</span>
               </li>
             ))}
@@ -115,7 +111,7 @@ export function Hub() {
             ring. All nodes are idle.
           </figcaption>
         </figure>
-      </div>
-    </RevealSection>
+      </Section.Inner>
+    </Section.Root>
   );
 }
