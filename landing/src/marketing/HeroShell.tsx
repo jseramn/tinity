@@ -1,11 +1,9 @@
 import { REPO_HREF } from "../content/version";
 import { Stage } from "../experience/Stage";
-import { GhostButton, GhostLink } from "./Ghost";
+import { GhostLink } from "./Ghost";
 import { Nav } from "./Nav";
-import { useWindow } from "./shell";
 
 export function HeroCaption() {
-  const { open } = useWindow();
   return (
     <div className="hero-caption">
       <p className="eyebrow">TINITY / HARNESS</p>
@@ -18,7 +16,7 @@ export function HeroCaption() {
         <GhostLink href={REPO_HREF} target="_blank" rel="noopener noreferrer">
           GitHub
         </GhostLink>
-        <GhostButton onClick={() => open("docs")}>Docs · soon</GhostButton>
+        <GhostLink href="/developers">Docs</GhostLink>
       </div>
       <a className="scroll-hint" href="#status">
         SCROLL

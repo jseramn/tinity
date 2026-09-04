@@ -42,6 +42,7 @@ function Docs() {
       <p>Docs are coming soon.</p>
       <p>
         Until then, read{" "}
+        <a href="/developers">/developers</a>,{" "}
         <a href={`${import.meta.env.BASE_URL}index.md`}>index.md</a>,{" "}
         <a href={`${import.meta.env.BASE_URL}design.md`}>design.md</a>, and the{" "}
         <a href={REPO_HREF} target="_blank" rel="noopener noreferrer">

@@ -2,7 +2,24 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
   "outputDirectory": "dist",
+  "cleanUrls": true,
+  "headers": [
+    {
+      "source": "/",
+      "headers": [{ "key": "Vary", "value": "Accept, Accept-Encoding" }]
+    },
+    {
+      "source": "/index.html",
+      "headers": [{ "key": "Vary", "value": "Accept, Accept-Encoding" }]
+    }
+  ],
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/",
+      "has": [
+        { "type": "header", "key": "accept", "value": "(.*)text/markdown(.*)" }
+      ],
+      "destination": "/index.md"
+    }
   ]
 }

@@ -4,11 +4,24 @@
 
 Tinity studies, evaluates, designs, and implements infrastructure for AI harnesses. It is not a firm and not a chatbot. Current release: v0.1.0.
 
+## When to use
+
+Read this site when you are evaluating Tinity as a harness-of-harnesses layer: product intent, which slices are shipped versus later, and how to run the localhost cursor-gateway (OpenAI-compat wrap around cursor-agent on 127.0.0.1:4390). Prefer [index.md](https://tinity.jseramn.tech/index.md) or `Accept: text/markdown` on https://tinity.jseramn.tech/ for the same overview. Use [developers.md](https://tinity.jseramn.tech/developers.md) for clone and local-gateway steps. Use [design.md](https://tinity.jseramn.tech/design.md) for tokens. Use [changelog.md](https://tinity.jseramn.tech/changelog.md) for history.
+
+## When not to use
+
+Do not treat tinity.jseramn.tech as a live multi-tenant API, API-key portal, fleet scheduler, Slack bus, or Layer 8 runtime. There is no public eval endpoint and no hosted sandbox here. Idle harness tiles on the landing are marketing status, not live connectors.
+
 ## Files
 
 - [Overview](https://tinity.jseramn.tech/index.md): manifesto, slices, harness statuses
+- [Developers](https://tinity.jseramn.tech/developers.md): local cursor-gateway, no hosted keys
+- [About](https://tinity.jseramn.tech/about.md): what Tinity is
+- [Contact](https://tinity.jseramn.tech/contact.md): GitHub Issues and X
+- [Privacy](https://tinity.jseramn.tech/privacy.md): static-site privacy
 - [Changelog](https://tinity.jseramn.tech/changelog.md): Keep a Changelog
 - [Design system](https://tinity.jseramn.tech/design.md): DESIGN.md tokens
+- [Sitemap](https://tinity.jseramn.tech/sitemap.xml)
 - [Source](https://github.com/jseramn/tinity): MIT
 
 ## Optional

@@ -400,11 +400,13 @@ html, body {
 
 ## 13. Marketing IA (`/tinity`)
 
-One page. No subpages. Hash sections. Windows via `?w=`. Agent surface via `?surface=agent`.
+One page human canvas (Stage). Hash sections. Windows via `?w=`. Agent surface via `?surface=agent`.
+
+Static sibling documents exist for agents and crawlers and do **not** replace the lattice: `/about`, `/contact`, `/privacy`, `/developers`, plus markdown twins. Do not add a React path router or restore a SPA catch-all rewrite.
 
 | Band | Role |
 |------|------|
-| Nav | 52px hairline. Lockup (24px mark + wordmark). HUMAN / AGENT. Ghost GitHub. Docs · soon. Under 768px: lockup + switch + menu dialog. |
+| Nav | 52px hairline. Lockup (24px mark + wordmark). HUMAN / AGENT. Ghost GitHub. Docs → `/developers`. Under 768px: lockup + switch + menu dialog. |
 | Hero | `100svh` grid `auto 1fr auto`. Stage fills the middle. Caption: eyebrow `TINITY / HARNESS`, H1 "A friend to all harnesses.", one-line dek, ghost GitHub + Docs. `tinity me` is the only accent action. |
 | Status | `#status`. One-column left-aligned head: `RUNS ON v0.1.0` + `17 IDLE`, then 17 pips. `idle` is grayscale. `live` may use the 4–8px green halo. |
 | Hub | `#hub`. Split head (title left, dek left-aligned). Square sectional rack, Tinity LED at the shared origin, orthogonal traces. 17 bidirectional traffic dots. `prefers-reduced-motion` is static. Mobile: stacked tiles. |
@@ -412,7 +414,7 @@ One page. No subpages. Hash sections. Windows via `?w=`. Agent surface via `?sur
 | Changelog | `#changelog`. Three dated `.panel` cards. Full changelog opens a window. |
 | Community | `#community`. GitHub, X, Slack coming. One Contribute ghost. |
 | FAQ | `#faq`. Five `details[name=faq]`. No JS accordion. |
-| Footer | Flow credits (not fixed). MIT + version. |
+| Footer | Flow credits (not fixed). MIT + version. About, Contact, Privacy, Developers. |
 
 Marketing sections compose as `Section.Root / Inner / Header / Copy / Title / Dek`. Cards compose as `Panel` inside `PanelGrid`. Windows compose as `Window.Frame` + `Window.Docs` | `Window.Changelog`. Surfaces are explicit: `HumanSurface` vs `AgentSurface`.
 
@@ -427,10 +429,10 @@ Windows: one native `<dialog>`, max 720px, radius 0, 1px border plus the single 
 Same origin. Same URL.
 
 - `?surface=agent` sets `data-surface="agent"`. Marketing spine unmounts. Markdown twin renders with Copy page.
-- Twins: `/tinity/llms.txt`, `/tinity/index.md`, `/tinity/changelog.md`, `/tinity/design.md`.
+- Twins: `/llms.txt`, `/index.md`, `/changelog.md`, `/design.md`, `/about.md`, `/contact.md`, `/privacy.md`, `/developers.md`.
 - `<link rel="alternate" type="text/markdown">` on the HTML shell.
 - `#tinity-state` JSON: version + harness count + status.
-- JSON-LD `SoftwareSourceCode`.
+- JSON-LD `@graph`: `SoftwareApplication`, `SoftwareSourceCode`, `Person`. No invented PostalAddress.
 - Stage Escape unflips only when no `dialog[open]`.
 
 Present-tense claims are limited to shipped work: landing, cursor-gateway v0.1.0, connector library. Layer 8, eval, Slack bus, fleets, and sandboxes stay future tense.
