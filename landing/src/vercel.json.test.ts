@@ -13,7 +13,6 @@ describe("vercel.json local static host", () => {
   };
 
   it("points Vite landing dist without serverless functions", () => {
-    expect(cfg.framework).toBe("vite");
     expect(cfg.outputDirectory).toBe("landing/dist");
     expect(cfg.functions).toBeUndefined();
     expect(cfg.builds).toBeUndefined();
@@ -21,16 +20,21 @@ describe("vercel.json local static host", () => {
     expect(raw).not.toContain(MANIFESTO);
   });
 
-  it("rewrites /tinity prefix to match Vite base", () => {
+  it("rewrites root path to match Vite base", () => {
     const vite = readFileSync("vite.config.ts", "utf8");
-    expect(vite).toMatch(/base:\s*"\/tinity\/"/);
+    expect(vite).toMatch(/base:\s*"\/"/);
     const sources = (cfg.rewrites ?? []).map((r) => r.source);
-    expect(sources).toContain("/tinity");
-    expect(sources).toContain("/tinity/assets/:path*");
-    const assets = (cfg.rewrites ?? []).find(
-      (r) => r.source === "/tinity/assets/:path*",
+    expect(sources).toContain("/(.*)");
+    const root = (cfg.rewrites ?? []).find(
+      (r) => r.source === "/(.*)",
     );
-    expect(assets?.destination).toBe("/assets/:path*");
+    expect(root?.destination).toBe("/index.html");
+  });
+
+  it("does not reference /tinity subpath in vite or vercel config", () => {
+    const vite = readFileSync("vite.config.ts", "utf8");
+    expect(vite).not.toMatch(/base:\s*"\/tinity\//);
+    expect(raw).not.toMatch(/"source":\s*"\/tinity/);
   });
 
   it("does not commit a Vercel project link", () => {

@@ -10,13 +10,27 @@ Current release: **v0.1.0**.
 
 ## Links
 
-Public landing path is `/tinity/` (`vercel.json`). Production surface: [jseramn.tech/tinity](https://www.jseramn.tech/tinity/).
+Production surface: [tinity.jseramn.tech](https://tinity.jseramn.tech). Legacy path [jseramn.tech/tinity](https://www.jseramn.tech/tinity/) will redirect to the subdomain once cutover completes.
 
 - [Changelog](CHANGELOG.md)
 - [Agent twin](landing/public/llms.txt)
 - X [@jseramn_](https://x.com/jseramn_)
 - X [@tinityorch](https://x.com/tinityorch)
 - [jseramn.tech](https://jseramn.tech)
+
+## Deploy model
+
+Tinity is a monorepo that deploys the `/landing` sub-project only. The repo root contains `landing/`, `packages/`, `openspec/`. The repo-level `vercel.json` declares `framework: "vite"` and `outputDirectory: "landing/dist"`. The landing's own `landing/vercel.json` declares `outputDirectory: "dist"` (relative to the landing root when Vercel uses root directory `landing/`).
+
+Vercel project for Tinity should:
+- Point to this repository
+- Set root directory to `landing/`
+- Use production domain `tinity.jseramn.tech`
+- Use preview domains `*.tinity.jseramn.tech` for PR previews
+
+Portfolio is a separate repo (`github.com/jseramn/portfolio`) on Astro. Portfolio does not contain Tinity source code. Each repo has its own Vercel project and its own domain.
+
+See `openspec/changes/landing-domain-split/` for the full deploy-isolation plan.
 
 ## Current state
 
