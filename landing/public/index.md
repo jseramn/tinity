@@ -5,7 +5,7 @@ Tinity is an agentic systems engineering framework designed to build a harness-o
 - Version: 0.1.0
 - Repository: https://github.com/jseramn/tinity
 - License: MIT
-- Production path: https://www.jseramn.tech/tinity/
+- Production path: https://tinity.jseramn.tech/
 
 ## What runs today
 

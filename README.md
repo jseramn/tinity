@@ -58,9 +58,9 @@ pnpm --dir landing dev
 pnpm --dir landing build
 ```
 
-Vite `base` is `/tinity/`. Production asset URLs start with that prefix.
+Vite `base` is `/`. Production asset URLs are root-relative.
 
-Intended static host is Vercel (`vercel.json` at the repo root). Live production is the portfolio copy at jseramn.tech/tinity.
+Intended static host is Vercel (`vercel.json` at the repo root, root directory `landing/`). Live production is [tinity.jseramn.tech](https://tinity.jseramn.tech), served by a dedicated Vercel project. The legacy path `jseramn.tech/tinity/*` returns 301 to the new domain.
 
 Local wrap (127.0.0.1:4390). Package deps already present; do not install. See packages/cursor-gateway/README.md. Tests mock spawn and must not fire a live Grok job.
 

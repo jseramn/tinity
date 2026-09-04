@@ -33,6 +33,6 @@ export const FAQ: readonly FaqItem[] = [
     id: "vercel",
     question: "Are you on the Vercel OSS program?",
     answer:
-      "The landing is hosted under jseramn.tech/tinity and the repo carries a Vercel OSS badge. We are applying to the Vercel open source program. Membership is not claimed.",
+      "The landing is hosted at tinity.jseramn.tech and the repo carries a Vercel OSS badge. We are applying to the Vercel open source program. Membership is not claimed.",
   },
 ];
