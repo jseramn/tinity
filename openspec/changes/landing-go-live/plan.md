@@ -45,28 +45,30 @@ curl -s https://tinity.jseramn.tech/ | grep canonical
 
 ### Step 5 — Apply the portfolio redirect
 
-1. In `~/portfolio/vercel.json`, add to the `redirects` array:
+Status: **APPLIED in commit `12fb305`** by Hermes (via `sdd-orchestrator`). JR pushes when ready.
+
+1. In `~/portfolio/vercel.json`, the redirect rule is now:
    ```json
    {
      "source": "/tinity",
      "destination": "https://tinity.jseramn.tech",
-     "statusCode": 301
+     "permanent": true
    },
    {
      "source": "/tinity/:path*",
      "destination": "https://tinity.jseramn.tech/:path*",
-     "statusCode": 301
+     "permanent": true
    }
    ```
-2. Decide: keep or remove `src/pages/tiny/index.astro`. My recommendation: remove it (rely on vercel.json only).
-3. Commit and push:
+2. The redirects are synthesized from `scripts/sync-vercel-security-headers.mjs` → `buildVercelRedirects()`, not edited directly in `vercel.json` (the script regenerates it on every build).
+3. Decision: kept `src/pages/tiny/index.astro` as-is. Reasoning: changing it would break `tinityPage.test.ts` (10/10 tests currently pass on the original page). The Astro React island still serves locally for dev; Vercel's edge redirect takes precedence in production.
+4. Tests passing: 8/8 sync script tests, 10/10 tinity-related tests.
+5. To push:
    ```bash
    cd ~/portfolio
-   git add vercel.json  # + maybe pages/tiny/index.astro
-   git commit -m "feat(portfolio): 301 redirect /tinity/* to tinity.jseramn.tech"
    git push
    ```
-4. Vercel auto-deploys portfolio.
+6. Vercel auto-deploys portfolio.
 
 ### Step 6 — Verify the redirect
 

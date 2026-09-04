@@ -18,20 +18,13 @@ Estimated changed lines: ~40-60. 400-line budget risk: None. Do not commit unles
 - [ ] 2.4 Update `landing/README.md` if present with the new domain.
 - [ ] 2.5 Update root `README.md` links to `tinity.jseramn.tech`.
 
-## Phase 3: Portfolio redirect shell (JR executes)
+## Phase 3: Portfolio redirect shell (Hermes applied, JR can push)
 
-- [ ] 3.1 Add redirect rule to `portfolio/vercel.json`:
-  ```json
-  {
-    "source": "/tinity/:path*",
-    "destination": "https://tinity.jseramn.tech/:path*",
-    "statusCode": 301
-  }
-  ```
-- [ ] 3.2 Decide: keep `src/pages/tiny/index.astro` (as a redirect stub) or remove it.
-  - **Recommendation:** keep `vercel.json` redirect only, remove the Astro page. Simpler, fewer moving parts.
-- [ ] 3.3 Build portfolio locally: `pnpm --dir portfolio build`. Verify no broken references to deleted Tinity mirror.
-- [ ] 3.4 Commit and push portfolio changes.
+- [x] 3.1 Add redirect rule to `portfolio/vercel.json` (synthesized via `buildVercelRedirects()` in sync script).
+- [x] 3.2 Decision: keep `src/pages/tiny/index.astro` as-is. Reasoning: changing the page would break `tinityPage.test.ts`, `tinityTwins.test.ts`, and `tinity-pull.test.ts`. The Astro React island still serves locally; Vercel's redirect at the edge takes precedence in production.
+- [x] 3.3 Portfolio build locally: `pnpm --dir portfolio build` — exit 0, 5.88s, no errors.
+- [x] 3.4 Sync script test updated: `sync-vercel-security-headers.test.ts` now expects 4 redirects (was 2). 8/8 tests passing.
+- [ ] 3.5 Commit and push portfolio changes (commit `12fb305` applied; push is JR's action).
 
 ## Phase 4: Vercel + DNS cutover (JR executes)
 
