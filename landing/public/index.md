@@ -51,4 +51,8 @@ There is not yet an in-tree sandbox controller or fleet scheduler.
 - [index.md](./index.md) (this page)
 - [changelog.md](./changelog.md)
 - [design.md](./design.md)
+- [about.md](./about.md)
+- [contact.md](./contact.md)
+- [privacy.md](./privacy.md)
+- [developers.md](./developers.md)
 - [README](https://github.com/jseramn/tinity/blob/main/README.md)

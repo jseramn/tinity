@@ -13,6 +13,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="alternate" type="text/markdown" href="/index.md" title="Markdown" />
     <meta property="og:title" content="Tinity" />
+    <meta property="og:type" content="website" />
     <meta property="og:url" content="https://tinity.jseramn.tech/" />
     <meta
       property="og:description"
@@ -25,11 +26,38 @@
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "SoftwareSourceCode",
-        "name": "Tinity",
-        "codeRepository": "https://github.com/jseramn/tinity",
-        "license": "https://github.com/jseramn/tinity/blob/main/LICENSE",
-        "programmingLanguage": "TypeScript"
+        "@graph": [
+          {
+            "@type": "SoftwareApplication",
+            "name": "Tinity",
+            "description": "A friend to all harnesses. Harness-of-harnesses for AI testing and evaluation.",
+            "url": "https://tinity.jseramn.tech/",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "Web",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            }
+          },
+          {
+            "@type": "SoftwareSourceCode",
+            "name": "Tinity",
+            "codeRepository": "https://github.com/jseramn/tinity",
+            "license": "https://github.com/jseramn/tinity/blob/main/LICENSE",
+            "programmingLanguage": "TypeScript",
+            "url": "https://tinity.jseramn.tech/"
+          },
+          {
+            "@type": "Person",
+            "name": "Jose Ramon",
+            "url": "https://jseramn.tech",
+            "sameAs": [
+              "https://github.com/jseramn",
+              "https://x.com/jseramn_"
+            ]
+          }
+        ]
       }
     </script>
     <script type="application/json" id="tinity-state">
@@ -42,6 +70,47 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- tinity-crawler-start -->
+    <noscript>
+      <article>
+<h1>Tinity</h1>
+<p>Tinity is an agentic systems engineering framework designed to build a harness-of-harnesses infrastructure for AI testing and evaluation. MIT license. The vision is not to replace or drive any other harness out of the market. Tinity exists to be a friend to all, to work alongside other harnesses and orchestrate them, putting advanced tools in creative developers' hands. Layer 8 will be agent-based.</p>
+<ul><li>Version: 0.1.0</li><li>Repository: https://github.com/jseramn/tinity</li><li>License: MIT</li><li>Production path: https://tinity.jseramn.tech/</li></ul>
+<h2>What runs today</h2>
+<p>Slice · Status</p>
+<p>Marketing landing (Vite React 19, lattice Stage) · shipped</p>
+<p>cursor-gateway v0.1.0 (localhost OpenAI-compat wrap around cursor-agent) · shipped</p>
+<p>Connector pattern library · shipped (library only, no live Slack)</p>
+<p>OpenClaw ↔ Hermes contract · in design</p>
+<p>Policy layer 2.1 (rules, SQLite audit, CLI) · next</p>
+<p>Harness adoption over Slack · next</p>
+<p>Layer 8 (runtimes, sandboxes, fleets) · later</p>
+<p>There is not yet an in-tree sandbox controller or fleet scheduler.</p>
+<h2>Harnesses</h2>
+<p>17 harnesses on the landing. All status <code>idle</code> until a connector reports live.</p>
+<p>Label · Id · Status · URL</p>
+<p>Grok Bot · <code>grok-bot</code> · idle · https://x.ai/bot</p>
+<p>OpenClaw · <code>openclaw</code> · idle · https://openclaw.ai</p>
+<p>OpenHands · <code>openhands</code> · idle · https://openhands.dev</p>
+<p>Cursor CLI · <code>cursor-cli</code> · idle · https://cursor.com/cli</p>
+<p>Qwen Code · <code>qwen-code</code> · idle · https://qwen.ai/qwencode</p>
+<p>Claude Code · <code>claude-code</code> · idle · https://claude.com/product/claude-code</p>
+<p>Mastra Code · <code>mastra-code</code> · idle · https://mastra.ai</p>
+<p>dcode · <code>dcode</code> · idle · https://www.langchain.com/dcode</p>
+<p>Cline · <code>cline</code> · idle · https://cline.bot</p>
+<p>Crush · <code>crush</code> · idle · https://github.com/charmbracelet/crush</p>
+<p>Goose · <code>goose</code> · idle · https://block.github.io/goose</p>
+<p>Aider · <code>aider</code> · idle · https://aider.chat</p>
+<p>Grok Build · <code>grok-build</code> · idle · https://x.ai/build</p>
+<p>Cursor · <code>cursor</code> · idle · https://cursor.com</p>
+<p>Pi · <code>pi</code> · idle · https://pi.ai</p>
+<p>Hermes · <code>hermes</code> · idle · https://hermes-agent.nousresearch.com</p>
+<p>OpenCode · <code>opencode</code> · idle · https://opencode.ai</p>
+<h2>Agent files</h2>
+<ul><li><a href="./llms.txt">llms.txt</a></li><li><a href="./index.md">index.md</a> (this page)</li><li><a href="./changelog.md">changelog.md</a></li><li><a href="./design.md">design.md</a></li><li><a href="./about.md">about.md</a></li><li><a href="./contact.md">contact.md</a></li><li><a href="./privacy.md">privacy.md</a></li><li><a href="./developers.md">developers.md</a></li><li><a href="https://github.com/jseramn/tinity/blob/main/README.md">README</a></li></ul>
+      </article>
+    </noscript>
+    <!-- tinity-crawler-end -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

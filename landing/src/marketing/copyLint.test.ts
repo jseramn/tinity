@@ -24,6 +24,10 @@ describe("copy lint", () => {
       ...walk("src/content"),
       "public/index.md",
       "public/llms.txt",
+      "public/about.md",
+      "public/contact.md",
+      "public/privacy.md",
+      "public/developers.md",
     ];
     for (const file of files) {
       const text = readFileSync(file, "utf8");

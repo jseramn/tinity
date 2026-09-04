@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1fdb12" />
+    <meta name="description" content="Local cursor-gateway on 127.0.0.1:4390. No hosted API keys or cloud sandbox on this domain." />
+    <title>Developers · Tinity</title>
+    <link rel="canonical" href="https://tinity.jseramn.tech/developers" />
+    <link rel="alternate" type="text/markdown" href="/developers.md" title="Markdown" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      :root { color-scheme: dark; }
+      body { margin: 0; background: #050505; color: #e8e8e8; font-family: ui-sans-serif, system-ui, sans-serif; line-height: 1.5; }
+      main { max-width: 72ch; margin: 0 auto; padding: 48px 24px 96px; }
+      a { color: #1fdb12; }
+      h1, h2 { font-weight: 500; letter-spacing: -0.03em; }
+      nav { display: flex; flex-wrap: wrap; gap: 12px 16px; padding: 16px 24px; border-bottom: 1px solid #222; font-size: 13px; }
+      nav a { color: #a3a3a3; text-decoration: none; }
+      nav a:hover { color: #e8e8e8; }
+    </style>
+  </head>
+  <body>
+    <nav aria-label="Site">
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+    <a href="/contact">Contact</a>
+    <a href="/privacy">Privacy</a>
+    <a href="/developers">Developers</a>
+    <a href="/llms.txt">llms.txt</a>
+  </nav>
+    <main>
+      <h1>Developers</h1>
+<p>Tinity does not expose a public multi-tenant API, API key dashboard, or cloud sandbox on https://tinity.jseramn.tech. What shipped for developers is the Git repository, agent-readable twins, and a localhost OpenAI-compat wrap.</p>
+<h2>Quickstart</h2>
+<p>1. Clone https://github.com/jseramn/tinity 2. Read <a href="/index.md">index.md</a> and <a href="/llms.txt">llms.txt</a> for what is shipped versus later. 3. Run cursor-gateway locally (not on Vercel): from the repo, use <code>pnpm --dir packages/cursor-gateway start</code>. 4. Bind is 127.0.0.1:4390. Preflight <code>GET /health</code> then <code>GET /v1/models</code> before <code>POST /v1/chat/completions</code>. 5. Auth is Cursor login on the machine (optional inherited CURSOR_API_KEY). Do not send AI_GATEWAY_API_KEY to the child.</p>
+<p>cursor-gateway is not a Vercel Function. It spawns <code>cursor-agent</code>; it does not reimplement the agent. See packages/cursor-gateway/README.md.</p>
+<h2>Agent files</h2>
+<ul><li>https://tinity.jseramn.tech/llms.txt</li><li>https://tinity.jseramn.tech/index.md</li><li>https://tinity.jseramn.tech/developers.md (this page)</li><li>https://tinity.jseramn.tech/design.md</li><li>https://tinity.jseramn.tech/changelog.md</li><li>https://tinity.jseramn.tech/sitemap.xml</li></ul>
+<p>Send <code>Accept: text/markdown</code> to https://tinity.jseramn.tech/ for the overview twin.</p>
+<h2>Sandbox</h2>
+<p>There is no hosted sandbox. Idle cubes on the lattice are marketing status. Layer 8 runtimes stay later. Do not expect API keys to be issued from this page.</p>
+    </main>
+  </body>
+</html>

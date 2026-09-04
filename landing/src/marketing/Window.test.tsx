@@ -7,16 +7,15 @@ import { ShellProviders } from "./shell";
 import { WindowHost } from "./Window";
 
 describe("Window", () => {
-  it("opens docs from the nav and closes on the dialog close button", async () => {
+  it("opens the docs window from ?w=docs and closes on the dialog close button", async () => {
     const user = userEvent.setup();
+    window.history.pushState({}, "", "/?w=docs");
     render(
       <ShellProviders>
         <Nav />
         <WindowHost />
       </ShellProviders>,
     );
-    await user.click(screen.getAllByRole("button", { name: "Docs · soon" })[0]!);
-    expect(window.location.search).toMatch(/w=docs/);
     const dialog = screen.getByRole("dialog");
     expect(dialog).toBeVisible();
     expect(screen.getByRole("heading", { name: "Docs" })).toBeInTheDocument();
@@ -26,6 +25,7 @@ describe("Window", () => {
 
   it("opens the changelog variant from Full changelog", async () => {
     const user = userEvent.setup();
+    window.history.pushState({}, "", "/");
     render(
       <ShellProviders>
         <Changelog />

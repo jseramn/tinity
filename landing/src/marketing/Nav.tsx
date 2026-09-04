@@ -2,7 +2,6 @@ import { useRef } from "react";
 import { REPO_HREF } from "../content/version";
 import { GhostButton, GhostLink } from "./Ghost";
 import { Lockup } from "./Lockup";
-import { useWindow } from "./shell";
 import { SurfaceSwitch } from "./SurfaceSwitch";
 
 const DRAWER_HASHES = [
@@ -15,7 +14,6 @@ const DRAWER_HASHES = [
 ] as const;
 
 export function Nav() {
-  const { open } = useWindow();
   const menuRef = useRef<HTMLDialogElement>(null);
 
   const closeMenu = () => {
@@ -35,9 +33,12 @@ export function Nav() {
         >
           GitHub ↗
         </GhostLink>
-        <GhostButton className="nav-desktop" onClick={() => open("docs")}>
-          Docs · soon
-        </GhostButton>
+        <GhostLink
+          className="nav-desktop"
+          href="/developers"
+        >
+          Docs
+        </GhostLink>
         <button
           type="button"
           className="nav-menu"
@@ -54,14 +55,12 @@ export function Nav() {
         <GhostLink href={REPO_HREF} target="_blank" rel="noopener noreferrer">
           GitHub ↗
         </GhostLink>
-        <GhostButton
-          onClick={() => {
-            open("docs");
-            closeMenu();
-          }}
-        >
-          Docs · soon
-        </GhostButton>
+        <GhostLink href="/developers" onClick={closeMenu}>
+          Docs
+        </GhostLink>
+        <GhostLink href="/about" onClick={closeMenu}>
+          About
+        </GhostLink>
         {DRAWER_HASHES.map(([href, label]) => (
           <GhostLink key={href} href={href} onClick={closeMenu}>
             {label}

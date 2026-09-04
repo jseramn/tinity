@@ -564,6 +564,25 @@
   color: var(--text-dim);
 }
 
+.site-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 0;
+}
+
+.site-footer-links a {
+  color: var(--text-dim);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+}
+
+.site-footer-links a:hover,
+.site-footer-links a:focus-visible {
+  color: var(--text);
+}
+
 .win {
   width: min(720px, calc(100vw - 32px));
   max-height: 80vh;
