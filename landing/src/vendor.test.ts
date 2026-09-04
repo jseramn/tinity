@@ -45,9 +45,16 @@ describe("html shell", () => {
     expect(html).toMatch(/harness-of-harnesses/);
     expect(html).toMatch(/Friend to all harnesses/);
     expect(html).toMatch(/Layer 8 will be agent-based/);
-    expect(html).not.toContain(MANIFESTO);
+    const description = html.match(
+      /name="description"[\s\S]*?content="([^"]+)"/,
+    )?.[1];
+    expect(description).toBeTruthy();
+    expect(description).not.toBe(MANIFESTO);
+    expect(description!.length).toBeLessThan(MANIFESTO.length);
     expect(html).toMatch(/rel="alternate"\s+type="text\/markdown"/);
     expect(html).toMatch(/id="tinity-state"/);
     expect(html).toMatch(/SoftwareSourceCode/);
+    expect(html).toMatch(/SoftwareApplication/);
+    expect(html).toMatch(/property="og:type"\s+content="website"/);
   });
 });

@@ -1,9 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": null,
-  "buildCommand": "pnpm --dir landing build",
-  "outputDirectory": "landing/dist",
-  "installCommand": "pnpm --dir landing install --frozen-lockfile --ignore-workspace",
+  "framework": "vite",
+  "outputDirectory": "dist",
   "cleanUrls": true,
   "headers": [
     {

@@ -11,7 +11,10 @@ describe("HeroCaption", () => {
       </ShellProviders>,
     );
     expect(screen.getByRole("link", { name: "GitHub" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Docs · soon" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Docs" })).toHaveAttribute(
+      "href",
+      "/developers",
+    );
     expect(screen.queryByRole("button", { name: "Agent surface" })).not.toBeInTheDocument();
   });
 });

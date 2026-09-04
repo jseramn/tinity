@@ -21,9 +21,9 @@ describe("Nav", () => {
       "false",
     );
     expect(screen.getAllByRole("link", { name: "GitHub ↗" }).length).toBeGreaterThan(0);
-    expect(
-      screen.getAllByRole("button", { name: "Docs · soon" }).length,
-    ).toBeGreaterThan(0);
+    const docs = screen.getAllByRole("link", { name: "Docs" });
+    expect(docs.length).toBeGreaterThan(0);
+    expect(docs[0]).toHaveAttribute("href", "/developers");
   });
 
   it("switches to the agent surface via query", async () => {
