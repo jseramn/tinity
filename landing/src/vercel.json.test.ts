@@ -7,6 +7,8 @@ describe("vercel.json local static host", () => {
   const cfg = JSON.parse(raw) as {
     framework?: string;
     outputDirectory?: string;
+    installCommand?: string;
+    buildCommand?: string;
     rewrites?: { source: string; destination: string }[];
     builds?: unknown;
     functions?: unknown;
@@ -18,6 +20,17 @@ describe("vercel.json local static host", () => {
     expect(cfg.builds).toBeUndefined();
     expect(raw).not.toContain("VERCEL_TOKEN");
     expect(raw).not.toContain(MANIFESTO);
+  });
+
+  it("installs workspace deps from the repo root so Vercel can build landing/", () => {
+    expect(cfg.installCommand).toBe("pnpm install --frozen-lockfile");
+    expect(cfg.buildCommand).toBe("pnpm --dir landing build");
+    expect(cfg.installCommand).not.toMatch(/do not install/);
+  });
+
+  it("uploads workspace packages so frozen pnpm install can resolve the lockfile", () => {
+    const ignore = readFileSync("../.vercelignore", "utf8");
+    expect(ignore).not.toMatch(/^packages$/m);
   });
 
   it("rewrites root path to match Vite base", () => {

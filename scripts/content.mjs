@@ -74,7 +74,7 @@ Tinity is an agentic systems engineering framework designed to build a harness-o
 - Version: ${pkg.version}
 - Repository: https://github.com/jseramn/tinity
 - License: MIT
-- Production path: https://www.jseramn.tech/tinity/
+- Production path: https://tinity.jseramn.tech/
 
 ## What runs today
 
@@ -117,15 +117,15 @@ Tinity studies, evaluates, designs, and implements infrastructure for AI harness
 
 ## Files
 
-- [Overview](https://www.jseramn.tech/tinity/index.md): manifesto, slices, harness statuses
-- [Changelog](https://www.jseramn.tech/tinity/changelog.md): Keep a Changelog
-- [Design system](https://www.jseramn.tech/tinity/design.md): DESIGN.md tokens
+- [Overview](https://tinity.jseramn.tech/index.md): manifesto, slices, harness statuses
+- [Changelog](https://tinity.jseramn.tech/changelog.md): Keep a Changelog
+- [Design system](https://tinity.jseramn.tech/design.md): DESIGN.md tokens
 - [Source](https://github.com/jseramn/tinity): MIT
 
 ## Optional
 
-- [Human surface](https://www.jseramn.tech/tinity/): lattice + marketing spine
-- [Agent surface](https://www.jseramn.tech/tinity/?surface=agent): same URL, markdown twin
+- [Human surface](https://tinity.jseramn.tech/): lattice + marketing spine
+- [Agent surface](https://tinity.jseramn.tech/?surface=agent): same URL, markdown twin
 `;
 
 writeFileSync(path.join(pub, "llms.txt"), llmsTxt);

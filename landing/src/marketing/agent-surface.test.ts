@@ -18,5 +18,12 @@ describe("agent twins", () => {
       expect(index).toContain(agent.id);
     }
     expect(AGENTS).toHaveLength(17);
+    expect(index).toContain("https://tinity.jseramn.tech/");
+    expect(index).not.toContain("https://www.jseramn.tech/tinity");
+    expect(llms).toContain("https://tinity.jseramn.tech/");
+    expect(llms).not.toContain("https://www.jseramn.tech/tinity");
+    const generator = readFileSync("../scripts/content.mjs", "utf8");
+    expect(generator).toContain("https://tinity.jseramn.tech/");
+    expect(generator).not.toContain("https://www.jseramn.tech/tinity");
   });
 });

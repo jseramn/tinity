@@ -3,7 +3,7 @@
   "framework": null,
   "buildCommand": "pnpm --dir landing build",
   "outputDirectory": "landing/dist",
-  "installCommand": "echo 'landing/node_modules already present; do not install.'",
+  "installCommand": "pnpm install --frozen-lockfile",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
