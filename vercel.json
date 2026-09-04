@@ -3,7 +3,7 @@
   "framework": null,
   "buildCommand": "pnpm --dir landing build",
   "outputDirectory": "landing/dist",
-  "installCommand": "pnpm install --frozen-lockfile",
+  "installCommand": "pnpm --dir landing install --frozen-lockfile --ignore-workspace",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]

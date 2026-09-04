@@ -22,15 +22,17 @@ describe("vercel.json local static host", () => {
     expect(raw).not.toContain(MANIFESTO);
   });
 
-  it("installs workspace deps from the repo root so Vercel can build landing/", () => {
-    expect(cfg.installCommand).toBe("pnpm install --frozen-lockfile");
+  it("installs only landing deps from landing/pnpm-lock.yaml", () => {
+    expect(cfg.installCommand).toBe(
+      "pnpm --dir landing install --frozen-lockfile --ignore-workspace",
+    );
     expect(cfg.buildCommand).toBe("pnpm --dir landing build");
     expect(cfg.installCommand).not.toMatch(/do not install/);
   });
 
-  it("uploads workspace packages so frozen pnpm install can resolve the lockfile", () => {
+  it("keeps cursor-gateway off the Vercel upload", () => {
     const ignore = readFileSync("../.vercelignore", "utf8");
-    expect(ignore).not.toMatch(/^packages$/m);
+    expect(ignore).toMatch(/^packages$/m);
   });
 
   it("rewrites root path to match Vite base", () => {
