@@ -52,10 +52,10 @@ describe("hubLayout", () => {
     const nodes = hubLayout(IDS);
     const inbound = spokePath(nodes[0]!);
     const outbound = sendPath(nodes[0]!);
-    expect(inbound).toBe("M96.000 96.000 L96.000 400.000 L400.000 400.000");
-    expect(outbound).toBe("M400.000 400.000 L96.000 400.000 L96.000 96.000");
+    expect(inbound).toBe("M64.000 64.000 L64.000 400.000 L400.000 400.000");
+    expect(outbound).toBe("M400.000 400.000 L64.000 400.000 L64.000 64.000");
     expect(spokePath(nodes[1]!)).toBe(
-      "M217.600 96.000 L217.600 400.000 L400.000 400.000",
+      "M198.400 64.000 L198.400 400.000 L400.000 400.000",
     );
   });
 
@@ -63,6 +63,6 @@ describe("hubLayout", () => {
     expect(markHubTransform()).toContain(
       `translate(${MARK_VIEWBOX.minX} ${MARK_VIEWBOX.minY})`,
     );
-    expect(markHubTransform()).toMatch(/^translate\(400 400\) scale\(28\) /);
+    expect(markHubTransform()).toMatch(/^translate\(400 400\) scale\(36\) /);
   });
 });
